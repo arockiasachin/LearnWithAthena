@@ -1,0 +1,7 @@
+<!-- templates/student/assignments/partials/_quiz_generation_button.html -->
+<form method="POST" action="{{ url_for('student.generate_quiz', assignment_id=assignment.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-sm btn-primary">
+      <i class="bi bi-magic me-1"></i> {% if submission %}Regenerate{% else %}Generate{% endif %} Quiz
+    </button>
+  </form>

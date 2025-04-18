@@ -1,0 +1,79 @@
+{% extends "student_base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="card welcome-card mb-4">
+  <div class="card-body">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h2 class="mb-3">Welcome back, {{ session['student_name'] }}!</h2>
+        <p class="lead text-muted mb-0">Ready to continue your personalized learning journey?</p>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <img src="https://img.freepik.com/free-vector/hand-drawn-student-with-laptop_23-2147914864.jpg" alt="Student" style="max-height: 120px;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card profile-card h-100">
+      <div class="card-body">
+        <div class="feature-icon mx-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#0d6efd" viewBox="0 0 16 16">
+            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+          </svg>
+        </div>
+        <h4 class="text-center mb-3">Learning Style Quiz</h4>
+        <p class="text-center text-muted">Discover your personal learning preferences</p>
+        <div class="d-grid">
+          <a href="{{ url_for('quiz.quiz_dashboard') }}" class="btn btn-primary">Take Quiz</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Add another card here if needed -->
+  <div class="col-md-6">
+    <div class="card profile-card h-100">
+      <div class="card-body">
+        <div class="feature-icon mx-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#0d6efd" viewBox="0 0 16 16">
+            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+          </svg>
+        </div>
+        <h4 class="text-center mb-3">Your Courses</h4>
+        <p class="text-center text-muted">View your enrolled courses</p>
+        <div class="d-grid">
+          <a href="#" class="btn btn-primary">View Courses</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="card profile-card">
+  <div class="card-body">
+    <h4 class="mb-4">Recent Activity</h4>
+    <div class="list-group">
+      <a href="#" class="list-group-item list-group-item-action border-0">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">Completed Learning Style Quiz</h5>
+          <small class="text-muted">2 days ago</small>
+        </div>
+        <p class="mb-1">You discovered your learning preferences</p>
+      </a>
+      <a href="#" class="list-group-item list-group-item-action border-0">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">Started "Introduction to Python"</h5>
+          <small class="text-muted">1 week ago</small>
+        </div>
+        <p class="mb-1">Completed Module 1: Python Basics</p>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

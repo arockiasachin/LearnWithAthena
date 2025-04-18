@@ -1,0 +1,12 @@
+<!-- templates/student/quiz_generation_button.html -->
+{% macro quiz_generation_button(assignment) %}
+<div class="mt-3">
+    <form method="POST" action="{{ url_for('student.generate_quiz', assignment_id=assignment.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-sm btn-info">
+            <i class="bi bi-magic me-1"></i> Generate Practice Quiz
+        </button>
+        <small class="text-muted ms-2">Creates a quiz from this assignment</small>
+    </form>
+</div>
+{% endmacro %}

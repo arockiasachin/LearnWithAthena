@@ -1,0 +1,93 @@
+<!-- templates/student/quiz_generating.html -->
+{% extends "student_base.html" %}
+
+{% block title %}Generating Quiz{% endblock %}
+
+{% block extra_css %}
+<style>
+  .quiz-loading-container {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .spinner {
+    width: 4rem;
+    height: 4rem;
+    border-width: 0.35em;
+  }
+  
+  .progress-text {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    color: var(--bs-secondary);
+  }
+  
+  .quiz-info-card {
+    max-width: 500px;
+    margin: 2rem auto;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="quiz-loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    
+    <h3 class="mt-4">Generating Your Quiz</h3>
+    <p class="progress-text">Processing questions and answers...</p>
+    
+    <div class="quiz-info-card card">
+      <div class="card-body">
+        <h5 class="card-title">{{ assignment.title }}</h5>
+        <p class="card-text">{{ assignment.description|truncate(150) }}</p>
+        <div class="d-flex justify-content-between">
+          <span class="badge bg-secondary">
+            {% if assignment and assignment.subject %}
+              {{ assignment.subject.name }}
+            {% else %}
+              No Subject
+            {% endif %}
+          </span>
+          <span class="text-muted">Due: {{ assignment.due_date.strftime('%b %d') }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const attemptId = {{ attempt.id }};
+    const pollInterval = 2000; // 2 seconds
+    
+    function checkQuizStatus() {
+      fetch(`/quiz/${attemptId}?nocache=${Date.now()}`)
+        .then(response => {
+          if (response.redirected) {
+            // If we get redirected back here, quiz isn't ready yet
+            setTimeout(checkQuizStatus, pollInterval);
+          } else if (response.ok) {
+            // If we get a successful response, the quiz is ready - reload the page
+            window.location.href = `/quiz/${attemptId}`;
+          } else {
+            // Handle errors
+            setTimeout(checkQuizStatus, pollInterval);
+          }
+        })
+        .catch(() => setTimeout(checkQuizStatus, pollInterval));
+    }
+    
+    // Start polling
+    setTimeout(checkQuizStatus, pollInterval);
+  });
+  </script>
+{% endblock %}
+{% endblock %}

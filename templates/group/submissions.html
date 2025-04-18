@@ -1,0 +1,100 @@
+<!-- submissions.html -->
+{% extends "student_base.html" %}
+
+{% block title %}Submissions - {{ group.name }}{% endblock %}
+
+{% block content %}
+<div class="card profile-card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Project Submissions</h2>
+      <span class="badge bg-primary">Group: {{ group.name }}</span>
+    </div>
+
+    <!-- Video Submission Section -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Submit Presentation Video</h5>
+      </div>
+      <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label for="videoFile" class="form-label">Upload Presentation Video</label>
+            <input class="form-control" type="file" id="videoFile" name="video_file" accept="video/*">
+          </div>
+          <button type="submit" class="btn btn-primary">Evaluate Presentation</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Evaluation Results -->
+    {% if evaluation %}
+    <div class="card mb-4">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Presentation Evaluation Results</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card mb-3">
+              <div class="card-header bg-success text-white">
+                Project Evaluation
+              </div>
+              <div class="card-body">
+                <h5>Grade: {{ evaluation.project_grade }}/10</h5>
+                <p>{{ evaluation.project_reasoning }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card mb-3">
+              <div class="card-header bg-success text-white">
+                Presentation Evaluation
+              </div>
+              <div class="card-body">
+                <h5>Grade: {{ evaluation.presentation_grade }}/10</h5>
+                <p>{{ evaluation.presentation_reasoning }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header bg-warning text-dark">
+            Feedback & Suggestions
+          </div>
+          <div class="card-body">
+            <div class="markdown-content">
+              {{ evaluation.feedback|markdown }}
+            </div>
+          </div>
+        </div>
+
+        {% if transcript %}
+        <div class="card mt-3">
+          <div class="card-header bg-secondary text-white">
+            Transcript
+          </div>
+          <div class="card-body">
+            <pre>{{ transcript }}</pre>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Existing submission table -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Current Submission</h5>
+        <a href="#" class="btn btn-sm btn-light">New Submission</a>
+      </div>
+      <div class="card-body">
+        <!-- ... existing table code ... -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

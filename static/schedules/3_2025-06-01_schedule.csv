@@ -1,0 +1,51 @@
+Week,Module Number,Module Title,Assignment Type,Assignment Title,Due Date,Description
+1,13,Introduction (Theory),Descriptive,Algorithm Development Stages,2025-06-06,400-word analysis comparing problem-solving approaches in algorithm design
+2,14,Overview and Importance of Algorithms (Theory),Coding,Complexity Analysis Implementation,2025-06-09,Implement and compare time complexity of iterative vs recursive factorial
+2,14,Overview and Importance of Algorithms (Theory),Debugging,Recursive Error Fix,2025-06-11,Identify and fix 4 errors in a flawed recursive implementation
+3,1,Analyzing the complexity of iterative and recursive algorithms (Lab),Quiz,Complexity Analysis Quiz,2025-06-11,10 questions on Big-O notation and recurrence relations
+3,1,Analyzing the complexity of iterative and recursive algorithms (Lab),Descriptive,Recursion vs Iteration,2025-06-13,500-word comparative analysis with real-world examples
+4,2,Implement Linear data structures (Stacks),Coding,Stack Operations,2025-06-16,Implement stack with push/pop operations and overflow handling
+4,2,Implement Linear data structures (Stacks),Debugging,Stack Implementation Fix,2025-06-18,Debug a stack implementation with 3 logical errors
+5,15,Stages of algorithm development: Describing the problem (Theory),Quiz,Problem Formulation Quiz,2025-06-18,12 MCQs on problem decomposition techniques
+5,15,Stages of algorithm development: Describing the problem (Theory),Descriptive,Algorithm Specification,2025-06-20,400-word description of a real-world problem specification
+6,3,Linear time sorting techniques (Lab),Coding,Counting Sort Implementation,2025-06-23,Implement counting sort with edge case handling
+6,3,Linear time sorting techniques (Lab),Debugging,Radix Sort Fix,2025-06-25,Identify and correct 4 errors in radix sort implementation
+7,16,Identifying a suitable technique (Theory),Quiz,Algorithm Selection Quiz,2025-06-25,15 questions on matching problems to algorithmic approaches
+7,16,Identifying a suitable technique (Theory),Descriptive,Technique Justification,2025-06-27,500-word analysis justifying algorithm choice for a given problem
+8,4,Interpolation search & Exponential search (Lab),Coding,Hybrid Search Algorithm,2025-06-30,Implement exponential search with interpolation refinement
+8,4,Interpolation search & Exponential search (Lab),Debugging,Search Algorithm Fix,2025-07-02,Debug an exponential search implementation with 3 errors
+9,17,Design of an algorithm (Theory),Quiz,Algorithm Design Quiz,2025-07-02,10 MCQs on pseudocode conventions and design patterns
+9,17,Design of an algorithm (Theory),Descriptive,Design Trade-offs,2025-07-04,400-word analysis of space-time tradeoffs in algorithm design
+10,5,Binary tree & Tree traversals (Lab),Debugging,BST Validation Fix,2025-07-09,Fix 5 errors in a binary search tree validation algorithm
+11,18,Illustration of Design Stages (Theory),Quiz,Design Process Quiz,2025-07-09,12 questions on algorithm development lifecycle
+11,18,Illustration of Design Stages (Theory),Descriptive,Case Study Analysis,2025-07-11,500-word breakdown of a published algorithm's design process
+12,6,B-trees & B+ trees (Lab),Coding,B-tree Insertion,2025-07-14,Implement B-tree insertion with node splitting
+12,6,B-trees & B+ trees (Lab),Debugging,B+ Tree Fix,2025-07-16,Correct 4 implementation errors in B+ tree operations
+13,7,Advanced Trees: 2-3 tree,Quiz,Balanced Trees Quiz,2025-07-16,15 MCQs on 2-3 trees and their properties
+13,7,Advanced Trees: 2-3 tree,Descriptive,Tree Comparison,2025-07-18,400-word comparison of 2-3 trees vs B-trees for database applications
+14,8,Advanced Trees: Threaded Binary trees,Coding,Threaded Tree Traversal,2025-07-21,Implement in-order traversal using thread pointers
+14,8,Advanced Trees: Threaded Binary trees,Debugging,Threading Fix,2025-07-23,Fix 3 pointer errors in threaded tree implementation
+15,19,Greedy techniques: Graph Coloring Problem (Theory),Quiz,Greedy Algorithms Quiz,2025-07-23,10 questions on greedy approach characteristics
+15,19,Greedy techniques: Graph Coloring Problem (Theory),Descriptive,Greedy Application,2025-07-25,500-word analysis of greedy approach in scheduling problems
+16,9,Graph traversals (BFS,Coding,BFS Implementation,2025-07-28,Implement BFS with adjacency list representation
+16,9,Graph traversals (BFS,Debugging,DFS Fix,2025-07-30,Correct 4 implementation errors in DFS algorithm
+17,20,Job Sequencing Problem with Deadlines (Theory),Quiz,Scheduling Quiz,2025-07-30,12 MCQs on job sequencing and greedy approaches
+17,20,Job Sequencing Problem with Deadlines (Theory),Descriptive,Real-world Scheduling,2025-08-01,400-word application of job sequencing to CPU scheduling
+18,10,Determining the Shortest path between pair of nodes in the given graph (Lab),Coding,Dijkstra's Algorithm,2025-08-04,Implement Dijkstra's with priority queue
+18,10,Determining the Shortest path between pair of nodes in the given graph (Lab),Debugging,Path Finding Fix,2025-08-06,Fix 5 errors in a shortest path implementation
+19,21,Divide and Conquer: Karatsuba's fast multiplication method (Theory),Quiz,Divide & Conquer Quiz,2025-08-06,15 questions on D&C paradigm and applications
+19,21,Divide and Conquer: Karatsuba's fast multiplication method (Theory),Descriptive,Multiplication Analysis,2025-08-08,500-word comparison of multiplication algorithms
+20,11,Minimum Spanning trees- reverse delete & Boruvka's algorithm (Lab),Coding,Boruvka's Algorithm,2025-08-11,Implement Boruvka's algorithm for MST
+20,11,Minimum Spanning trees- reverse delete & Boruvka's algorithm (Lab),Debugging,Kruskal's Fix,2025-08-13,Correct 3 implementation errors in Kruskal's algorithm
+21,22,The Strassen algorithm for matrix multiplication (Theory),Quiz,Matrix Algorithms Quiz,2025-08-13,10 MCQs on matrix operation complexities
+21,22,The Strassen algorithm for matrix multiplication (Theory),Descriptive,Algorithm Optimization,2025-08-15,400-word analysis of Strassen's optimization approach
+22,12,Heaps & Hashing (Lab),Coding,Heap Operations,2025-08-18,Implement max-heap with insert/extract operations
+22,12,Heaps & Hashing (Lab),Debugging,Hash Table Fix,2025-08-20,Fix 4 collision handling errors in hash table implementation
+23,23,Dynamic programming: Matrix Chain Multiplication (Theory),Quiz,DP Fundamentals Quiz,2025-08-20,12 questions on dynamic programming principles
+23,23,Dynamic programming: Matrix Chain Multiplication (Theory),Descriptive,DP Application,2025-08-22,500-word analysis of DP in bioinformatics
+24,24,Longest Common Subsequence (Theory),Coding,LCS Implementation,2025-08-25,Implement LCS with memoization
+24,24,Longest Common Subsequence (Theory),Debugging,Edit Distance Fix,2025-08-27,Correct 5 errors in edit distance DP implementation
+25,25,Backtracking: N-Queens problem (Theory),Quiz,Backtracking Quiz,2025-08-27,15 MCQs on backtracking and pruning
+25,25,Backtracking: N-Queens problem (Theory),Descriptive,Constraint Satisfaction,2025-08-29,400-word analysis of backtracking in CSPs
+26,26,Subset Sum (Theory),Coding,Subset Sum Solver,2025-09-01,Implement backtracking solution for subset sum
+26,26,Subset Sum (Theory),Debugging,Knapsack Fix,2025-09-03,Fix 3 implementation errors in 0/1 knapsack solution

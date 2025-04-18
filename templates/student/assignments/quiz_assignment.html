@@ -1,0 +1,132 @@
+{% extends "student_base.html" %}
+
+{% block title %}{{ assignment.title }} - Quiz{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-body">
+            <h2>{{ assignment.title }}</h2>
+            <p class="lead">{{ assignment.description }}</p>
+            
+            <div class="mb-3">
+                <span class="badge bg-secondary">{{ assignment.subject.name }}</span>
+                <span class="badge bg-info ms-2">Quiz</span>
+                {% if assignment.time_limit_seconds %}
+                <span class="badge bg-warning text-dark ms-2">
+                    <i class="bi bi-clock me-1"></i>
+                    {{ assignment.time_limit_seconds // 60 }} min
+                </span>
+                {% endif %}
+            </div>
+            
+            {% if submission %}
+                <div class="alert alert-info">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Submitted on {{ submission.submitted_at.strftime('%Y-%m-%d') }} |
+                    Score: {{ submission.grade or 'Pending' }}%
+                </div>
+            {% endif %}
+            
+            <div class="action-buttons mt-4">
+                {% if assignment.due_date.date() >= current_date or assignment.allow_late_submissions %}
+                    {% if attempt and attempt.status == 'ready' %}
+                        <a href="{{ url_for('quiz_loading.view_quiz', attempt_id=attempt.id) }}" 
+                           class="btn btn-success">
+                            <i class="bi bi-play-fill me-1"></i> Take Quiz
+                        </a>
+                        <form method="POST" action="{{ url_for('student.generate_quiz', assignment_id=assignment.id) }}" class="d-inline ms-2">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-repeat me-1"></i> Regenerate
+                            </button>
+                        </form>
+                    {% else %}
+                        <form method="POST" action="{{ url_for('student.generate_quiz', assignment_id=assignment.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-magic me-1"></i> Generate Quiz
+                            </button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <span class="btn btn-outline-secondary disabled">
+                        <i class="bi bi-lock me-1"></i> Quiz Closed
+                    </span>
+                {% endif %}
+                
+                <a href="{{ url_for('student.view_assignments') }}" 
+                   class="btn btn-outline-secondary ms-2">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Assignments
+                </a>
+            </div>
+            
+            {% if attempts %}
+            <div class="mt-4">
+                <h5>Previous Attempts</h5>
+                <div class="list-group">
+                    {% for attempt in attempts %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-{{ 'success' if attempt.status == 'completed' else 'warning' }}">
+                                    {{ attempt.status|title }}
+                                </span>
+                                <span class="ms-2">
+                                    {{ attempt.started_at.strftime('%Y-%m-%d %H:%M') }}
+                                </span>
+                                {% if attempt.score is not none %}
+                                <span class="ms-2">Score: {{ attempt.score }}%</span>
+                                {% endif %}
+                            </div>
+                            {% if attempt.status == 'ready' %}
+                            <a href="{{ url_for('quiz_loading.view_quiz', attempt_id=attempt.id) }}" 
+                               class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-play-fill me-1"></i> Continue
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if attempt and attempt.status == 'generating' %}
+                <div class="mt-4">
+                    <div class="alert alert-info">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm me-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div>
+                                <strong>Generating your quiz...</strong>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                         style="width: {{ attempt.progress.split('%')[0] }}%">
+                                        {{ attempt.progress }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Auto-refresh page every 5 seconds if quiz is generating
+document.addEventListener('DOMContentLoaded', function() {
+    const generatingAlert = document.querySelector('.alert-info .progress-bar');
+    if (generatingAlert) {
+        setTimeout(function() {
+            window.location.reload();
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

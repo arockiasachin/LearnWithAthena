@@ -1,0 +1,535 @@
+{% extends "student_base.html" %}
+
+{% block title %}Submission Details{% endblock %}
+
+{% block extra_css %}
+<style>
+  .test-case {
+    border-left: 4px solid #6c757d;
+    border-radius: 0.25rem;
+    background: #f8f9fa;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .test-case.passed {
+    border-color: #198754;
+    background-color: #d1e7dd;
+  }
+  .test-case.failed {
+    border-color: #dc3545;
+    background-color: #f8d7da;
+  }
+  code {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+  }
+  .execution-metrics {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  .code-output {
+    background: #1e1e1e;
+    color: #e0e0e0;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+  }
+  .score-breakdown {
+    background: #e7f1ff;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+  }
+  .test-case-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .grade-hidden {
+    opacity: 0.6;
+    filter: blur(4px);
+    user-select: none;
+    pointer-events: none;
+  }
+  .rubric-criteria {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+  .rubric-level {
+    background: #f8f9fa;
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .debugging-diff {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+  }
+  .quiz-question {
+    border-left: 4px solid #6c757d;
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .quiz-correct {
+    background-color: #d1e7dd;
+  }
+  .quiz-incorrect {
+    background-color: #f8d7da;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+          <i class="bi 
+            {% if submission.assignment.assignment_type == 'Coding' %}bi-code-square
+            {% elif submission.assignment.assignment_type == 'Descriptive' %}bi-file-text
+            {% elif submission.assignment.assignment_type == 'Debugging' %}bi-bug
+            {% elif submission.assignment.assignment_type == 'Quiz' %}bi-question-square
+            {% else %}bi-journal-text{% endif %} 
+            me-2"></i>
+          Submission Details
+        </h2>
+        <a href="{{ url_for('marks.view_marks') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Back to Marks
+        </a>
+      </div>
+      
+      {% if submission.assignment.due_date.date() > current_date and submission.status != 'graded' %}
+      <div class="alert alert-warning mb-4">
+        <i class="bi bi-clock-history me-2"></i>
+        Marks will be available after the due date ({{ submission.assignment.due_date.strftime('%b %d, %Y') }})
+      </div>
+      {% endif %}
+      
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title mb-3">Assignment Information</h5>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Title:</span>
+                  <strong>{{ submission.assignment.title }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Subject:</span>
+                  <span class="badge bg-secondary">{{ submission.assignment.subject.name }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Type:</span>
+                  <span class="badge 
+                        {% if submission.assignment.assignment_type == 'Coding' %}bg-info
+                        {% elif submission.assignment.assignment_type == 'Descriptive' %}bg-primary
+                        {% elif submission.assignment.assignment_type == 'Debugging' %}bg-danger
+                        {% elif submission.assignment.assignment_type == 'Quiz' %}bg-warning text-dark
+                        {% else %}bg-secondary{% endif %}">
+                    {{ submission.assignment.assignment_type }}
+                  </span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Due Date:</span>
+                  <span>{{ submission.assignment.due_date.strftime('%b %d, %Y') }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Max Points:</span>
+                  <span>{{ submission.assignment.max_points }}</span>
+                </li>
+                {% if submission.assignment.assignment_type == 'Coding' %}
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Language:</span>
+                  <span class="badge bg-info">{{ submission.submission_data.language|upper }}</span>
+                </li>
+                {% elif submission.assignment.assignment_type == 'Debugging' %}
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Language:</span>
+                  <span class="badge bg-info">{{ submission.assignment.language|upper }}</span>
+                </li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title mb-3">Your Submission</h5>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Submitted:</span>
+                  <span>{{ submission.submitted_at.strftime('%b %d, %Y at %H:%M') }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Status:</span>
+                  <span class="badge 
+                        {% if submission.status == 'graded' %}bg-success
+                        {% else %}bg-warning text-dark{% endif %}">
+                    {{ submission.status|title }}
+                  </span>
+                </li>
+                {% if submission.grade is not none %}
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Final Grade:</span>
+                  <span class="badge 
+                        {% if submission.assignment.due_date.date() <= current_date or submission.status == 'graded' %}
+                          {% if submission.grade >= 80 %}bg-success
+                          {% elif submission.grade >= 50 %}bg-warning text-dark
+                          {% else %}bg-danger{% endif %}
+                        {% else %}bg-light text-dark grade-hidden{% endif %}">
+                    {% if submission.assignment.due_date.date() <= current_date or submission.status == 'graded' %}
+                      {{ submission.grade|round(2) }}/{{ submission.assignment.max_points }}
+                    {% else %}
+                      Hidden
+                    {% endif %}
+                  </span>
+                </li>
+                {% endif %}
+                {% if submission.is_late and (submission.assignment.due_date.date() <= current_date or submission.status == 'graded') %}
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Late Penalty:</span>
+                  <span class="text-danger">-{{ (submission.late_penalty * 100)|round(1) }}%</span>
+                </li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coding Assignment Results Section -->
+      {% if submission.assignment.assignment_type == 'Coding' and (submission.assignment.due_date.date() <= current_date or submission.status == 'graded') %}
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="mb-3"><i class="bi bi-code-square me-2"></i>Coding Results</h5>
+          
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="score-breakdown">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Total Score:</span>
+                  <strong>{{ submission.grade|round(2) }}/{{ submission.assignment.max_points }}</strong>
+                </div>
+                <div class="progress mb-3" style="height: 10px;">
+                  <div class="progress-bar bg-success" 
+                       role="progressbar" 
+                       style="width: {{ (submission.grade/submission.assignment.max_points)*100 }}%">
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between small">
+                  <span>Visible Tests:</span>
+                  <span>{{ submission.submission_data.stats.visible_passed }}/{{ submission.submission_data.stats.visible_total }} passed</span>
+                </div>
+                <div class="d-flex justify-content-between small">
+                  <span>Hidden Tests:</span>
+                  <span>{{ submission.submission_data.stats.hidden_passed }}/{{ submission.submission_data.stats.hidden_total }} passed</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="alert {% if execution_results and execution_results.success %}alert-success{% else %}alert-danger{% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6 class="mb-0"><i class="bi bi-terminal me-2"></i>Execution</h6>
+                  {% if execution_results %}
+                  <div class="execution-metrics">
+                    <span class="badge bg-dark">
+                      <i class="bi bi-stopwatch me-1"></i>{{ execution_results.time_elapsed|round(2) }}s
+                    </span>
+                    <span class="badge bg-dark">
+                      <i class="bi bi-memory me-1"></i>{{ execution_results.memory_used }}MB
+                    </span>
+                  </div>
+                  {% endif %}
+                </div>
+                {% if execution_results and execution_results.error_message %}
+                <div class="code-output mt-2">
+                  {{ execution_results.error_message }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Test Case Details -->
+          {% if submission.submission_data and submission.submission_data.test_results %}
+          <h5 class="mb-3"><i class="bi bi-list-check me-2"></i>Test Case Details</h5>
+          {% for test in submission.submission_data.test_results.visible %}
+          <div class="test-case {% if test.passed %}passed{% else %}failed{% endif %}">
+            <div class="test-case-title">
+              Test Case #{{ loop.index }} - 
+              <span class="badge {% if test.passed %}bg-success{% else %}bg-danger{% endif %}">
+                {{ "Passed" if test.passed else "Failed" }}
+              </span>
+            </div>
+            
+            <div class="mt-2">
+              <div class="input"><strong>Input:</strong> <code>{{ test.input }}</code></div>
+              <div class="expected mt-1"><strong>Expected:</strong> <code>{{ test.expected }}</code></div>
+              <div class="actual mt-1"><strong>Actual:</strong> <code>{{ test.received }}</code></div>
+              {% if test.error %}
+              <div class="code-output mt-2">
+                <strong>Error:</strong>
+                {{ test.error }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Debugging Assignment Results Section -->
+      {% if submission.assignment.assignment_type == 'Debugging' and (submission.assignment.due_date.date() <= current_date or submission.status == 'graded') %}
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="mb-3"><i class="bi bi-bug me-2"></i>Debugging Results</h5>
+          
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="score-breakdown">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Total Score:</span>
+                  <strong>{{ submission.grade|round(2) }}/{{ submission.assignment.max_points }}</strong>
+                </div>
+                <div class="progress mb-3" style="height: 10px;">
+                  <div class="progress-bar bg-success" 
+                       role="progressbar" 
+                       style="width: {{ (submission.grade/submission.assignment.max_points)*100 }}%">
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between small">
+                  <span>Errors Fixed:</span>
+                  <span>{{ submission.errors_fixed|length }}/{{ submission.assignment.error_count }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Code Comparison -->
+          <h5 class="mb-3"><i class="bi bi-file-diff me-2"></i>Code Corrections</h5>
+          <div class="debugging-diff mb-4">
+            <h6>Original Code with Bugs:</h6>
+            <pre class="code-output">{{ submission.assignment.buggy_code }}</pre>
+            
+            <h6 class="mt-3">Your Corrected Code:</h6>
+            <pre class="code-output">{{ submission.corrected_code }}</pre>
+          </div>
+
+          <!-- Errors Fixed -->
+          <h5 class="mb-3"><i class="bi bi-check-circle me-2"></i>Identified Errors</h5>
+          {% for error in submission.errors_fixed %}
+          <div class="test-case {% if error.verified %}passed{% else %}failed{% endif %}">
+            <div class="test-case-title">
+              Error #{{ loop.index }} - 
+              <span class="badge {% if error.verified %}bg-success{% else %}bg-danger{% endif %}">
+                {{ "Verified" if error.verified else "Not Verified" }}
+              </span>
+            </div>
+            <div class="mt-2">
+              <div><strong>Description:</strong> {{ error.description }}</div>
+              {% if error.location %}
+              <div class="mt-1"><strong>Location:</strong> Line {{ error.location }}</div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Descriptive Assignment Results Section -->
+      {% if submission.assignment.assignment_type == 'Descriptive' and (submission.assignment.due_date.date() <= current_date or submission.status == 'graded') %}
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="mb-3"><i class="bi bi-file-text me-2"></i>Evaluation Results</h5>
+          
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="score-breakdown">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Total Score:</span>
+                  <strong>{{ submission.grade|round(2) }}/{{ submission.assignment.max_points }}</strong>
+                </div>
+                <div class="progress mb-3" style="height: 10px;">
+                  <div class="progress-bar bg-success" 
+                       role="progressbar" 
+                       style="width: {{ (submission.grade/submission.assignment.max_points)*100 }}%">
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between small">
+                  <span>Word Count:</span>
+                  <span>{{ submission.word_count }} (required: {{ submission.assignment.min_words }}-{{ submission.assignment.max_words }})</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rubric Evaluation -->
+          <h5 class="mb-3"><i class="bi bi-list-check me-2"></i>Rubric Evaluation</h5>
+          {% if submission.ai_feedback %}
+            {% for criteria in submission.assignment.rubric %}
+            <div class="rubric-criteria">
+              <h6>{{ criteria.criteria }} (Weight: {{ (criteria.weight * 100)|round }}%)</h6>
+              <p class="text-muted">{{ criteria.description }}</p>
+              
+              {% for level in criteria.levels %}
+              <div class="rubric-level {% if submission.ai_feedback.scores[criteria.criteria] >= level.score %}border border-success{% endif %}">
+                <div class="d-flex justify-content-between">
+                  <span>{{ level.score }} points:</span>
+                  {% if submission.ai_feedback.scores[criteria.criteria] >= level.score %}
+                  <span class="badge bg-success">Your Score</span>
+                  {% endif %}
+                </div>
+                <p class="mb-0 small">{{ level.description }}</p>
+              </div>
+              {% endfor %}
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="alert alert-info">Rubric evaluation not available</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Quiz Assignment Results Section -->
+      {% if submission.assignment.assignment_type == 'Quiz' and (submission.assignment.due_date.date() <= current_date or submission.status == 'graded') %}
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="mb-3"><i class="bi bi-question-square me-2"></i>Quiz Results</h5>
+          
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="score-breakdown">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Total Score:</span>
+                  <strong>{{ submission.score|round(2) }}/{{ submission.assignment.max_points }}</strong>
+                </div>
+                <div class="progress mb-3" style="height: 10px;">
+                  <div class="progress-bar bg-success" 
+                       role="progressbar" 
+                       style="width: {{ (submission.score/submission.assignment.max_points)*100 }}%">
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between small">
+                  <span>Questions:</span>
+                  <span>{{ submission.questions_count }} total</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Question Results -->
+          <h5 class="mb-3"><i class="bi bi-list-ol me-2"></i>Question Breakdown</h5>
+          {% if submission.results %}
+            {% for question_id, result in submission.results.items() %}
+            <div class="quiz-question {% if result.correct %}quiz-correct{% else %}quiz-incorrect{% endif %} p-3 rounded">
+              <h6>Question #{{ loop.index }}</h6>
+              <p>{{ result.question }}</p>
+              
+              <div class="mt-2">
+                <strong>Your Answer:</strong> {{ result.answer }}<br>
+                {% if result.correct %}
+                <span class="badge bg-success">Correct</span>
+                {% else %}
+                <span class="badge bg-danger">Incorrect</span>
+                {% if submission.assignment.show_correct_answers %}
+                <div class="mt-1">
+                  <strong>Correct Answer:</strong> {{ result.correct_answer }}
+                </div>
+                {% endif %}
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="alert alert-info">Detailed results not available</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Submission Content Section -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="mb-3">
+            <i class="bi 
+              {% if submission.assignment.assignment_type == 'Coding' %}bi-code-square
+              {% elif submission.assignment.assignment_type == 'Descriptive' %}bi-file-text
+              {% elif submission.assignment.assignment_type == 'Debugging' %}bi-bug
+              {% elif submission.assignment.assignment_type == 'Quiz' %}bi-question-square
+              {% else %}bi-journal-text{% endif %} 
+              me-2"></i>
+            Your Response
+          </h5>
+          
+          {% if submission.assignment.assignment_type == 'Coding' %}
+            <pre class="code-output">{{ submission.content }}</pre>
+          {% elif submission.assignment.assignment_type == 'Debugging' %}
+            <pre class="code-output">{{ submission.corrected_code }}</pre>
+          {% elif submission.assignment.assignment_type == 'Quiz' %}
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              See question-by-question results above
+            </div>
+          {% else %}
+            <div class="border rounded p-3 bg-light">
+              {{ submission.content or "No text response provided" }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      
+      {% if submission.attachments %}
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="mb-3">
+            <i class="bi bi-paperclip me-2"></i>
+            Attachments
+          </h5>
+          <div class="d-flex flex-wrap gap-2">
+            {% for attachment in submission.attachments %}
+            <a href="{{ url_for('student.download_submission_attachment', attachment_id=attachment.id) }}" 
+               class="badge bg-light text-dark text-decoration-none">
+              <i class="bi bi-file-earmark me-1"></i>{{ attachment.filename }}
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if submission.feedback and (submission.assignment.due_date.date() <= current_date or submission.status == 'graded') %}
+      <div class="card">
+        <div class="card-body">
+          <h5 class="mb-3">
+            <i class="bi bi-chat-square-text me-2"></i> 
+            Feedback
+          </h5>
+          <div class="border rounded p-3 bg-light">
+            {{ submission.feedback }}
+          </div>
+          {% if submission.graded_at %}
+          <div class="text-end mt-2 text-muted small">
+            Graded on {{ submission.graded_at.strftime('%b %d, %Y at %H:%M') }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

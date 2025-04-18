@@ -1,0 +1,198 @@
+{% extends "student_base.html" %}
+
+{% block title %}FSLSM Results Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .results-card {
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      border: none;
+    }
+    .dimension-title {
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+    .scale-container {
+      position: relative;
+      height: 30px;
+      background: linear-gradient(to right, #0d6efd, #f8f9fa, #0d6efd);
+      border-radius: 15px;
+      margin-bottom: 2rem;
+    }
+    .scale-marker {
+      position: absolute;
+      top: -25px;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .scale-pointer {
+      position: absolute;
+      top: -10px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 15px solid #dc3545;
+      transform: translateX(-50%);
+    }
+    .scale-label {
+      position: absolute;
+      bottom: -25px;
+      font-weight: 600;
+    }
+    .interpretation-card {
+      border-left: 4px solid #0d6efd;
+      background-color: white;
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+    }
+    .btn-retake {
+      border-radius: 10px;
+      padding: 0.6rem 2rem;
+      font-weight: 600;
+    }
+    .result-value {
+      font-weight: 700;
+      color: #0d6efd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-12">
+    <div class="card results-card">
+      <div class="card-body p-4 p-md-5">
+        <h1 class="mb-4 text-center">Your Learning Style Profile</h1>
+        <p class="text-center text-muted mb-5">Based on the Felder-Silverman Learning Style Model</p>
+        
+        {% if fslsm_result %}
+          <!-- Active-Reflective Dimension -->
+          <div class="mb-5">
+            <h4 class="dimension-title">Active-Reflective Dimension</h4>
+            <div class="scale-container">
+              <div class="scale-marker" style="left: 0%;">-11</div>
+              <div class="scale-marker" style="left: 25%;">-5.5</div>
+              <div class="scale-marker" style="left: 50%;">0</div>
+              <div class="scale-marker" style="left: 75%;">5.5</div>
+              <div class="scale-marker" style="left: 100%;">11</div>
+              <div class="scale-pointer" style="left: {{ ((fslsm_result[0]+11)/22)*100 }}%;"></div>
+              <div class="scale-label" style="left: 0%;">Reflective</div>
+              <div class="scale-label" style="left: 93%;">Active</div>
+            </div>
+            <p>Your score: <span class="result-value">{{ fslsm_result[0]|round(2) }}</span></p>
+            {% if fslsm_result[0] > 3 %}
+            <p>You have an <strong>active</strong> learning preference. You learn best by doing and engaging in activities.</p>
+            {% elif fslsm_result[0] < -3 %}
+            <p>You have a <strong>reflective</strong> learning preference. You learn best by thinking quietly before acting.</p>
+            {% else %}
+            <p>You are <strong>balanced</strong> between active and reflective learning styles.</p>
+            {% endif %}                
+          </div>
+
+          <!-- Sensing-Intuitive Dimension -->
+          <div class="mb-5">
+            <h4 class="dimension-title">Sensing-Intuitive Dimension</h4>
+            <div class="scale-container">
+              <div class="scale-marker" style="left: 0%;">-11</div>
+              <div class="scale-marker" style="left: 25%;">-5.5</div>
+              <div class="scale-marker" style="left: 50%;">0</div>
+              <div class="scale-marker" style="left: 75%;">5.5</div>
+              <div class="scale-marker" style="left: 100%;">11</div>
+              <div class="scale-pointer" style="left: {{ ((fslsm_result[1]+11)/22)*100 }}%;"></div>
+              <div class="scale-label" style="left: 0%;">Intuitive</div>
+              <div class="scale-label" style="left: 92%;">Sensing</div>
+            </div>
+            <p>Your score: <span class="result-value">{{ fslsm_result[1]|round(2) }}</span></p>
+            {% if fslsm_result[1] > 3 %}
+            <p>You have a <strong>sensing</strong> learning preference. You prefer concrete facts, data, and real-world applications.</p>
+            {% elif fslsm_result[1] < -3 %}
+            <p>You have an <strong>intuitive</strong> learning preference. You prefer abstract concepts, theories, and innovation.</p>
+            {% else %}
+            <p>You are <strong>balanced</strong> between sensing and intuitive learning styles.</p>
+            {% endif %}
+            
+          </div>
+
+          <!-- Visual-Verbal Dimension -->
+          <div class="mb-5">
+            <h4 class="dimension-title">Visual-Verbal Dimension</h4>
+            <div class="scale-container">
+              <div class="scale-marker" style="left: 0%;">-11</div>
+              <div class="scale-marker" style="left: 25%;">-5.5</div>
+              <div class="scale-marker" style="left: 50%;">0</div>
+              <div class="scale-marker" style="left: 75%;">5.5</div>
+              <div class="scale-marker" style="left: 100%;">11</div>
+              <div class="scale-pointer" style="left: {{ ((fslsm_result[2]+11)/22)*100 }}%;"></div>
+              <div class="scale-label" style="left: 0%;">Verbal</div>
+              <div class="scale-label" style="left: 94%;">Visual</div>
+            </div>
+            <p>Your score: <span class="result-value">{{ fslsm_result[2]|round(2) }}</span></p>
+            {% if fslsm_result[2] > 3 %}
+            <p>You have a <strong>visual</strong> learning preference. You learn best through diagrams, charts, and visual materials.</p>
+            {% elif fslsm_result[2] < -3 %}
+            <p>You have a <strong>verbal</strong> learning preference. You learn best through written and spoken explanations.</p>
+            {% else %}
+            <p>You are <strong>balanced</strong> between visual and verbal learning styles.</p>
+            {% endif %}                
+          </div>
+
+          <!-- Sequential-Global Dimension -->
+          <div class="mb-5">
+            <h4 class="dimension-title">Sequential-Global Dimension</h4>
+            <div class="scale-container">
+              <div class="scale-marker" style="left: 0%;">-11</div>
+              <div class="scale-marker" style="left: 25%;">-5.5</div>
+              <div class="scale-marker" style="left: 50%;">0</div>
+              <div class="scale-marker" style="left: 75%;">5.5</div>
+              <div class="scale-marker" style="left: 100%;">11</div>
+              <div class="scale-pointer" style="left: {{ ((fslsm_result[3]+11)/22)*100 }}%;"></div>
+              <div class="scale-label" style="left: 0%;">Global</div>
+              <div class="scale-label" style="left: 89%;">Sequential</div>
+            </div>
+            <p>Your score: <span class="result-value">{{ fslsm_result[3]|round(2) }}</span></p>
+            {% if fslsm_result[3] > 3 %}
+            <p>You have a <strong>sequential</strong> learning preference. You prefer linear, step-by-step learning.</p>
+            {% elif fslsm_result[3] < -3 %}
+            <p>You have a <strong>global</strong> learning preference. You prefer holistic, big-picture thinking.</p>
+            {% else %}
+            <p>You are <strong>balanced</strong> between sequential and global learning styles.</p>
+            {% endif %}
+            
+          </div>
+
+          <!-- Summary Card -->
+          <div class="card border-primary mb-5">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">Your Learning Style Summary</h5>
+            </div>
+            <div class="card-body">
+              <p>Based on your results, your dominant learning style preferences are:</p>
+              <ul>
+                <li><strong>{{ "Active" if fslsm_result[0] > 3 else "Reflective" if fslsm_result[0] < -3 else "Balanced" }}</strong> (Processing dimension)</li>
+                <li><strong>{{ "Sensing" if fslsm_result[1] > 3 else "Intuitive" if fslsm_result[1] < -3 else "Balanced" }}</strong> (Perception dimension)</li>
+                <li><strong>{{ "Visual" if fslsm_result[2] > 3 else "Verbal" if fslsm_result[2] < -3 else "Balanced" }}</strong> (Input dimension)</li>
+                <li><strong>{{ "Sequential" if fslsm_result[3] > 3 else "Global" if fslsm_result[3] < -3 else "Balanced" }}</strong> (Understanding dimension)</li>
+              </ul>                  
+            </div>
+          </div>
+
+        {% else %}
+          <div class="alert alert-info text-center">
+            <p>You have not taken the FSLSM quiz yet.</p>
+          </div>
+        {% endif %}
+        
+        <div class="d-grid">
+          <a href="{{ url_for('quiz.fslsm_quiz_step', step=1) }}" class="btn btn-primary btn-retake">
+            {% if fslsm_result %}Retake Quiz{% else %}Start Quiz{% endif %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

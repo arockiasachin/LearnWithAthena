@@ -1,0 +1,98 @@
+Week,Module Number,Module Title,Assignment Type,Assignment Title,Due Date,Description
+1,1,Database System Concepts and Architecture,Coding,Database Connection Setup,2025-06-06,Implement a basic database connection using Python/SQL with error handling
+2,2,Entity-Relationship (ER) Modelling,Descriptive,ER vs Relational Model Analysis,2025-06-09,400-word comparative analysis of ER and relational models with examples
+2,2,Entity-Relationship (ER) Modelling,Debugging,ER Diagram Correction,2025-06-11,Identify and fix 4 conceptual errors in a provided ER diagram
+3,3,Relational Model-Keys,Coding,Key Implementation Exercise,2025-06-13,Create a table schema with proper key constraints using SQL
+4,4,Integrity Constraints,Descriptive,Constraint Enforcement Analysis,2025-06-16,400-word analysis of real-world scenarios requiring different integrity constraints
+4,4,Integrity Constraints,Debugging,Constraint Violation Fix,2025-06-18,Identify and resolve 3 constraint violations in a provided database script
+5,5,Mapping ER model to Relational Schema,Quiz,Schema Mapping Quiz,2025-06-18,15 MCQs on ER-to-relational mapping rules and techniques
+5,5,Mapping ER model to Relational Schema,Coding,Schema Conversion Implementation,2025-06-20,Convert a given ER diagram to a functional relational schema
+6,6,Normalization,Descriptive,Normalization Trade-offs,2025-06-23,400-word analysis of normalization benefits vs performance considerations
+6,6,Normalization,Debugging,Normalization Errors,2025-06-25,Identify and correct 3 normalization errors in a provided database design
+7,7,Boyce Codd Normal Form,Quiz,BCNF Concepts Quiz,2025-06-25,15 MCQs testing understanding of BCNF and normalization forms
+7,7,Boyce Codd Normal Form,Coding,BCNF Implementation,2025-06-27,Normalize a given database to BCNF with proper justification
+8,8,Multi-valued dependency and Fourth Normal form,Descriptive,MVD Analysis,2025-06-30,400-word explanation of multi-valued dependencies with real-world examples
+8,8,Multi-valued dependency and Fourth Normal form,Debugging,4NF Correction Exercise,2025-07-02,Identify and resolve multi-valued dependency issues in a schema
+9,9,Storage and File Structure,Coding,File Organization Implementation,2025-07-04,Implement different file organization methods with performance comparison
+10,10,Indexing,Descriptive,Indexing Strategy Analysis,2025-07-07,400-word analysis of indexing strategies for different query patterns
+10,10,Indexing,Debugging,Index Optimization,2025-07-09,Identify and fix 3 suboptimal index implementations
+11,11,Query processing,Coding,Query Execution Plan Analysis,2025-07-11,Analyze and optimize given query execution plans
+12,12,Query Optimization,Descriptive,Optimizer Comparison,2025-07-14,400-word comparison of rule-based vs cost-based optimization
+12,12,Query Optimization,Debugging,Query Performance Fix,2025-07-16,Identify and resolve 3 performance bottlenecks in given queries
+13,13,Transaction Management,Quiz,ACID Properties Quiz,2025-07-16,15 MCQs testing understanding of transaction properties
+13,13,Transaction Management,Coding,Transaction Implementation,2025-07-18,Implement proper transaction handling in a banking scenario
+14,14,Concurrency Control,Descriptive,Concurrency Methods Analysis,2025-07-21,400-word comparison of locking vs timestamp concurrency control
+14,14,Concurrency Control,Debugging,Deadlock Resolution,2025-07-23,Identify and resolve deadlock scenarios in provided transaction logs
+15,15,Recovery,Coding,Recovery Implementation,2025-07-25,Implement a simple recovery mechanism using transaction logs
+16,16,Parallel Database Architecture,Descriptive,Parallel Architectures Comparison,2025-07-28,400-word analysis of shared-nothing vs shared-memory architectures
+16,16,Parallel Database Architecture,Debugging,Parallel Query Issues,2025-07-30,Identify and fix 3 issues in parallel query execution plans
+17,17,Data partitioning strategy,Quiz,Partitioning Quiz,2025-07-30,15 MCQs on horizontal vs vertical partitioning strategies
+17,17,Data partitioning strategy,Coding,Partition Implementation,2025-08-01,Implement and compare different partitioning strategies
+18,18,Inter-Query,Descriptive,Inter-Query Parallelism Analysis,2025-08-04,400-word explanation of inter-query parallelism with examples
+18,18,Inter-Query,Debugging,Parallel Scheduling Issues,2025-08-06,Identify and resolve 3 scheduling conflicts in parallel queries
+19,19,Intra-Query Parallelism,Quiz,Intra-Query Quiz,2025-08-06,15 MCQs on intra-query parallelism techniques
+19,19,Intra-Query Parallelism,Coding,Parallel Join Implementation,2025-08-08,Implement and compare parallel join algorithms
+20,20,Distributed Database Features,Descriptive,Distributed DB Challenges,2025-08-11,400-word analysis of challenges in distributed databases
+20,20,Distributed Database Features,Debugging,Distributed Query Issues,2025-08-13,Identify and fix 3 issues in distributed query execution
+21,21,Distributed Database Architecture,Quiz,Distributed Architecture Quiz,2025-08-13,15 MCQs on distributed database architectures
+21,21,Distributed Database Architecture,Coding,Distributed Schema Design,2025-08-15,Design a distributed schema for a given scenario
+22,22,Fragmentation,Descriptive,Fragmentation Strategies,2025-08-18,400-word comparison of fragmentation strategies with examples
+22,22,Fragmentation,Debugging,Fragment Allocation Issues,2025-08-20,Identify and resolve 3 fragment allocation problems
+23,23,Replication,Quiz,Replication Quiz,2025-08-20,15 MCQs on replication techniques and consistency models
+23,23,Replication,Coding,Replication Implementation,2025-08-22,Implement a basic master-slave replication scenario
+24,24,Distributed Query Processing,Descriptive,Distributed Query Optimization,2025-08-25,400-word analysis of distributed query optimization challenges
+24,24,Distributed Query Processing,Debugging,Distributed Join Issues,2025-08-27,Identify and fix 3 distributed join execution problems
+25,25,Distributed Transactions Processing,Quiz,Distributed Transactions Quiz,2025-08-27,15 MCQs on 2PC and distributed transaction protocols
+25,25,Distributed Transactions Processing,Coding,2PC Implementation,2025-08-29,Implement a simplified two-phase commit protocol
+26,26,Spatial database concepts,Descriptive,Spatial DB Applications,2025-09-01,400-word analysis of real-world spatial database applications
+26,26,Spatial database concepts,Debugging,Spatial Query Issues,2025-09-03,Identify and fix 3 issues in spatial queries
+27,27,Spatial data types and models,Quiz,Spatial Data Quiz,2025-09-03,15 MCQs on spatial data types and models
+27,27,Spatial data types and models,Coding,Spatial Data Implementation,2025-09-05,Implement basic spatial data operations
+28,28,Spatial operators and queries,Descriptive,Spatial Query Analysis,2025-09-08,400-word comparison of spatial query types with examples
+28,28,Spatial operators and queries,Debugging,Spatial Index Issues,2025-09-10,Identify and resolve 3 spatial indexing problems
+29,29,Indexing in spatial databases,Quiz,Spatial Indexing Quiz,2025-09-10,15 MCQs on R-trees and spatial indexing methods
+29,29,Indexing in spatial databases,Coding,Spatial Index Implementation,2025-09-12,Implement and compare different spatial indexing methods
+30,30,Multimedia database concepts,Descriptive,Multimedia DB Challenges,2025-09-15,400-word analysis of challenges in multimedia databases
+30,30,Multimedia database concepts,Debugging,Multimedia Query Issues,2025-09-17,Identify and fix 3 multimedia query processing problems
+31,31,Automatic Analysis of Images,Quiz,Image Analysis Quiz,2025-09-17,15 MCQs on image analysis techniques in databases
+31,31,Automatic Analysis of Images,Coding,Image Feature Extraction,2025-09-19,Implement basic image feature extraction for database storage
+32,32,Object Recognition in Images,Descriptive,Object Recognition Methods,2025-09-22,400-word comparison of object recognition techniques
+32,32,Object Recognition in Images,Debugging,Recognition Algorithm Issues,2025-09-24,Identify and resolve 3 issues in image recognition algorithms
+33,33,Semantic Tagging of Images,Quiz,Semantic Tagging Quiz,2025-09-24,15 MCQs on semantic tagging and metadata
+33,33,Semantic Tagging of Images,Coding,Tagging Implementation,2025-09-26,Implement a basic image tagging system with database storage
+34,34,Semi Structured databases- XML Schema-DTD- XPath- XQuery,Descriptive,XML vs Relational,2025-09-29,400-word comparison of XML and relational data models
+34,34,Semi Structured databases- XML Schema-DTD- XPath- XQuery,Debugging,XQuery Correction,2025-10-01,Identify and fix 3 errors in provided XQuery expressions
+35,35,Semantic Web,Quiz,Semantic Web Quiz,2025-10-01,15 MCQs on semantic web concepts and technologies
+35,35,Semantic Web,Coding,RDF Implementation,2025-10-03,Create and query a simple RDF dataset
+36,36,RDF,Descriptive,RDF Applications,2025-10-06,400-word analysis of RDF use cases in knowledge representation
+36,36,RDF,Debugging,RDF Query Issues,2025-10-08,Identify and resolve 3 SPARQL query problems
+37,37,RDFS,Quiz,RDFS Quiz,2025-10-08,15 MCQs on RDFS and ontology basics
+37,37,RDFS,Coding,Ontology Implementation,2025-10-10,Implement a simple domain ontology using RDFS
+38,38,Cloud databases- Data Storage Systems on the Cloud,Descriptive,Cloud DB Trade-offs,2025-10-13,400-word analysis of cloud database trade-offs
+38,38,Cloud databases- Data Storage Systems on the Cloud,Debugging,Cloud Deployment Issues,2025-10-15,Identify and fix 3 cloud database deployment problems
+39,39,Data Representation,Quiz,Data Representation Quiz,2025-10-15,15 MCQs on data serialization and representation formats
+39,39,Data Representation,Coding,Data Format Conversion,2025-10-17,Implement conversions between different data representation formats
+40,40,Partitioning and Retrieving Data,Descriptive,Cloud Partitioning Strategies,2025-10-20,400-word analysis of partitioning strategies in cloud databases
+40,40,Partitioning and Retrieving Data,Debugging,Partitioning Issues,2025-10-22,Identify and resolve 3 data partitioning problems
+41,41,Challenges with Cloud-Based Databases- NoSQL Data model: Aggregate Models,Quiz,NoSQL Quiz,2025-10-22,15 MCQs on NoSQL database models and characteristics
+41,41,Challenges with Cloud-Based Databases- NoSQL Data model: Aggregate Models,Coding,Aggregate Implementation,2025-10-24,Implement a simple aggregate data model
+42,42,Document Data Model,Descriptive,Document DB Analysis,2025-10-27,400-word comparison of document vs relational models
+42,42,Document Data Model,Debugging,Document Query Issues,2025-10-29,Identify and fix 3 document query problems
+43,43,Key Value Data Model,Quiz,Key-Value Quiz,2025-10-29,15 MCQs on key-value stores and their use cases
+43,43,Key Value Data Model,Coding,KV Store Implementation,2025-10-31,Implement a basic key-value store with CRUD operations
+44,44,Columnar Data Model,Descriptive,Columnar DB Analysis,2025-11-03,400-word analysis of columnar database advantages
+44,44,Columnar Data Model,Debugging,Columnar Query Issues,2025-11-05,Identify and resolve 3 columnar query optimization problems
+45,45,Graph-Based Data Model,Quiz,Graph DB Quiz,2025-11-05,15 MCQs on graph database concepts and querying
+45,45,Graph-Based Data Model,Coding,Graph Traversal Implementation,2025-11-07,Implement basic graph traversal algorithms
+46,46,Database Security Issues,Descriptive,Security Threat Analysis,2025-11-10,400-word analysis of current database security threats
+46,46,Database Security Issues,Debugging,Security Configuration Issues,2025-11-12,Identify and fix 3 database security misconfigurations
+47,47,Security Models,Quiz,Security Models Quiz,2025-11-12,15 MCQs on database security models and controls
+47,47,Security Models,Coding,Access Control Implementation,2025-11-14,Implement role-based access control for a database
+48,48,Different threats to databases,Descriptive,Threat Mitigation Strategies,2025-11-17,400-word analysis of threat mitigation techniques
+48,48,Different threats to databases,Debugging,Vulnerability Fixes,2025-11-19,Identify and patch 3 database vulnerabilities
+49,49,Challenges to maintaining database security,Quiz,Security Challenges Quiz,2025-11-19,15 MCQs on ongoing database security challenges
+49,49,Challenges to maintaining database security,Coding,Security Audit Implementation,2025-11-21,Implement a basic database security audit tool
+50,1,Database System Concepts and Architecture,Descriptive,Course Reflection,2025-11-24,400-word reflective essay on key database concepts learned
+50,2,Entity-Relationship (ER) Modelling,Coding,Final Project Implementation,2025-11-26,Complete implementation of a database system incorporating course concepts
+50,3,Relational Model-Keys,Quiz,Comprehensive Final Quiz,2025-11-26,50 MCQs covering all course modules
+50,4,Integrity Constraints,Debugging,Final Debugging Challenge,2025-11-28,Identify and resolve 5 complex issues in a complete database system

@@ -1,0 +1,263 @@
+{% extends "student_base.html" %}
+
+{% block title %}Update Profile{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.css" rel="stylesheet">
+<style>
+  .subject-card {
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+    cursor: move;
+  }
+  .subject-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  .subject-checkbox {
+    margin-right: 10px;
+  }
+  .subject-details {
+    flex-grow: 1;
+  }
+  .subject-code {
+    font-weight: bold;
+    color: #0d6efd;
+  }
+  .subject-credits {
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+  .selected-subject {
+    background-color: #f8f9fa;
+    border-left: 4px solid #0d6efd;
+  }
+  .sortable-chosen {
+    opacity: 0.8;
+    background-color: #e9ecef;
+  }
+  .sortable-ghost {
+    opacity: 0.5;
+    background-color: #c8ebfb;
+  }
+  .subject-grid {
+    min-height: 200px;
+  }
+  .priority-badge {
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-size: 0.8rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="card profile-card">
+    <div class="card-body">
+      <h2 class="mb-4">Update Your Profile</h2>
+      
+      <form method="POST" action="{{ url_for('student.update_profile') }}" id="profileForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- Basic Information Section -->
+        <div class="row mb-4">
+          <div class="col-md-6 mb-3">
+            <label for="registerNumber" class="form-label">Register Number</label>
+            <input type="text" class="form-control" id="registerNumber" name="register_number" 
+                   value="{{ student.register_number or '' }}" required>
+          </div>
+          <div class="col-md-6">
+            <label for="githubUsername" class="form-label">GitHub Username</label>
+            <input type="text" class="form-control" id="githubUsername" name="github_username" 
+                   value="{{ student.github_username or '' }}" required>
+          </div>
+        </div>
+        
+        <!-- Subjects Selection Section -->
+        <div class="mb-4">
+          <h5 class="mb-3">Enrolled Subjects</h5>
+          <p class="text-muted">Select and prioritize your subjects (drag to reorder)</p>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                  <span>Available Subjects</span>
+                  <small class="text-muted"><span id="selectedCount">{{ student.subjects|length }}</span> selected</small>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h6>Available Subjects</h6>
+                      <div class="list-group" id="availableSubjects">
+                        {% for subject in all_subjects %}
+                          {% if subject not in student.subjects %}
+                          <div class="list-group-item subject-card" data-id="{{ subject.id }}">
+                            <div class="d-flex align-items-center">
+                              <input class="form-check-input subject-checkbox" 
+                                     type="checkbox" 
+                                     name="enrolled_subjects" 
+                                     value="{{ subject.id }}"
+                                     id="subject_{{ subject.id }}">
+                              <div class="subject-details">
+                                <label class="form-check-label" for="subject_{{ subject.id }}">
+                                  <span class="subject-code">{{ subject.code }}</span> - {{ subject.name }}
+                                  <br>
+                                  <small class="subject-credits">{{ subject.credits }} credits</small>
+                                </label>
+                                {% if subject.description %}
+                                <p class="small text-muted mt-1 mb-0">{{ subject.description }}</p>
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <h6>Selected Subjects (Priority Order)</h6>
+                      <div class="list-group subject-grid" id="selectedSubjects">
+                        {% for subject in student.subjects %}
+                        <div class="list-group-item subject-card selected-subject" data-id="{{ subject.id }}">
+                          <div class="d-flex align-items-center">
+                            <span class="priority-badge">{{ loop.index }}</span>
+                            <input class="form-check-input subject-checkbox" 
+                                   type="checkbox" 
+                                   name="enrolled_subjects" 
+                                   value="{{ subject.id }}"
+                                   id="subject_{{ subject.id }}"
+                                   checked>
+                            <div class="subject-details">
+                              <label class="form-check-label" for="subject_{{ subject.id }}">
+                                <span class="subject-code">{{ subject.code }}</span> - {{ subject.name }}
+                                <br>
+                                <small class="subject-credits">{{ subject.credits }} credits</small>
+                              </label>
+                              {% if subject.description %}
+                              <p class="small text-muted mt-1 mb-0">{{ subject.description }}</p>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="d-grid gap-2 mt-4">
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-save"></i> Update Profile
+          </button>
+          <a href="{{ url_for('student.view_profile') }}" class="btn btn-outline-secondary btn-lg">
+            <i class="bi bi-eye"></i> View Profile
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Sortable for selected subjects
+    new Sortable(document.getElementById('selectedSubjects'), {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      onEnd: function() {
+        updatePriorityBadges();
+      }
+    });
+
+    // Make available subjects draggable (but not sortable)
+    new Sortable(document.getElementById('availableSubjects'), {
+      group: {
+        name: 'subjects',
+        pull: 'clone',
+        put: false
+      },
+      sort: false,
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      onEnd: function(evt) {
+        if (evt.to === document.getElementById('selectedSubjects')) {
+          const item = evt.item;
+          const checkbox = item.querySelector('.subject-checkbox');
+          checkbox.checked = true;
+          item.classList.add('selected-subject');
+          updateSelectedCount();
+          updatePriorityBadges();
+        }
+      }
+    });
+
+    // Handle checkbox changes
+    document.querySelectorAll('.subject-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const card = this.closest('.subject-card');
+        if (this.checked) {
+          // Move to selected list
+          document.getElementById('selectedSubjects').appendChild(card);
+          card.classList.add('selected-subject');
+        } else {
+          // Move to available list
+          document.getElementById('availableSubjects').appendChild(card);
+          card.classList.remove('selected-subject');
+        }
+        updateSelectedCount();
+        updatePriorityBadges();
+      });
+    });
+
+    // Update the selected count display
+    function updateSelectedCount() {
+      const selectedCount = document.querySelectorAll('#selectedSubjects .subject-card').length;
+      document.getElementById('selectedCount').textContent = selectedCount;
+    }
+
+    // Update priority numbers
+    function updatePriorityBadges() {
+      const selectedSubjects = document.querySelectorAll('#selectedSubjects .subject-card');
+      selectedSubjects.forEach((subject, index) => {
+        const badge = subject.querySelector('.priority-badge');
+        if (!badge) {
+          // Create badge if it doesn't exist
+          const newBadge = document.createElement('span');
+          newBadge.className = 'priority-badge';
+          newBadge.textContent = index + 1;
+          subject.querySelector('.d-flex').prepend(newBadge);
+        } else {
+          badge.textContent = index + 1;
+        }
+      });
+    }
+
+    // Initialize counts and badges
+    updateSelectedCount();
+    updatePriorityBadges();
+
+    // Form submission handler
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+      // No need for additional handling - the checkboxes will be submitted normally
+      // The order in the selected list represents priority
+    });
+  });
+</script>
+{% endblock %}

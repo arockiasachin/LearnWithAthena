@@ -1,0 +1,164 @@
+{% extends "teacher_base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>GitHub Report for {{ group.name }}</h2>
+    
+    <!-- Metrics Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card metric-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Commits</h5>
+                    <p class="metric-value">{{ metrics.total_commits }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Weekly Avg</h5>
+                    <p class="metric-value">{{ metrics.weekly_avg }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Lines Added</h5>
+                    <p class="metric-value">{{ metrics.lines_added }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Lines Deleted</h5>
+                    <p class="metric-value">{{ metrics.lines_deleted }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Markdown Report Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Code Analysis Report</h4>
+        </div>
+        <div class="card-body markdown-report">
+            {% for line in report.split('\n') %}
+                {% if line.startswith('###') %}
+                    <h3 class="report-title">{{ line[4:] }}</h3>
+                {% elif line.startswith('####') %}
+                    <h4 class="report-subtitle">{{ line[5:] }}</h4>
+                {% elif line.startswith('#####') %}
+                    <h5 class="report-section">{{ line[6:] }}</h5>
+                {% elif line.startswith('- **') %}
+                    <div class="alert alert-{{ 'danger' if '🚨' in line or '⚠️' in line else 'info' }}">
+                        {{ line.replace('**', '').replace('-', '•')|safe }}
+                    </div>
+                {% elif line.startswith('- ') %}
+                    <p class="report-item">{{ line[2:] }}</p>
+                {% elif line.startswith('---') %}
+                    <hr class="report-divider">
+                {% elif line.strip() %}
+                    <p class="report-text">{{ line }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Raw Data Section -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0">Raw Data</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Top Contributors</h5>
+                    {% if metrics.top_contributors %}
+                        <ul class="list-group">
+                            {% for contributor in metrics.top_contributors %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ contributor.split('(')[0] }}
+                                <span class="badge bg-primary rounded-pill">
+                                    {{ contributor.split('(')[1].split(')')[0] }}
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="alert alert-warning">No contributors found</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <h5>File Types</h5>
+                    {% if metrics.file_types %}
+                        <ul class="list-group">
+                            {% for ext, count in metrics.file_types.items() %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                .{{ ext }}
+                                <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="alert alert-warning">No file modifications found</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .metric-card {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    .metric-card:hover {
+        transform: translateY(-5px);
+    }
+    .metric-value {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 5px 0 0;
+    }
+    .markdown-report {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .report-title {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 5px;
+        margin-top: 20px;
+    }
+    .report-subtitle {
+        color: #34495e;
+        margin-top: 15px;
+    }
+    .report-section {
+        color: #7f8c8d;
+        margin-top: 10px;
+    }
+    .report-item {
+        margin-left: 20px;
+        position: relative;
+    }
+    .report-item:before {
+        content: "•";
+        position: absolute;
+        left: -15px;
+    }
+    .report-divider {
+        border-top: 2px dashed #bdc3c7;
+        margin: 20px 0;
+    }
+    .report-text {
+        margin: 10px 0;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}

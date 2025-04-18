@@ -1,0 +1,195 @@
+{% extends "teacher_base.html" %}
+
+{% block title %}{{ student.name }} - Contributions{% endblock %}
+
+{% block extra_css %}
+<style>
+    .commit-card {
+        border-left: 3px solid var(--bs-primary);
+    }
+    .task-progress {
+        height: 8px;
+    }
+    .avatar-lg {
+        width: 64px;
+        height: 64px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">{{ student.name }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('teacher.group_progress') }}">Groups</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('teacher.group_detail', group_id=group.group_id) }}">{{ group.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Contributions</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{{ url_for('teacher.export_contributions_csv', group_id=group.group_id) }}" 
+               class="btn btn-outline-primary">
+                <i class="bi bi-download me-1"></i> Export
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if student.github_avatar %}
+                    <img src="{{ student.github_avatar }}" class="avatar-lg rounded-circle mb-3" alt="{{ student.name }}">
+                    {% else %}
+                    <div class="avatar-lg rounded-circle bg-light d-flex align-items-center justify-content-center mb-3 mx-auto">
+                        <span class="fs-4">{{ student.name|first|upper }}</span>
+                    </div>
+                    {% endif %}
+                    <h5 class="mb-1">{{ student.name }}</h5>
+                    <p class="text-muted mb-2">{{ student.email }}</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        {% if student.github_username %}
+                        <a href="https://github.com/{{ student.github_username }}" target="_blank" 
+                           class="btn btn-sm btn-outline-dark">
+                            <i class="bi bi-github me-1"></i> GitHub
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted mb-2">Tasks Assigned</h6>
+                                    <h3 class="mb-0">{{ assigned_tasks|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted mb-2">Tasks Completed</h6>
+                                    <h3 class="mb-0">{{ completed_tasks }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted mb-2">Average Progress</h6>
+                                    <h3 class="mb-0">{{ avg_progress|round(1) }}%</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted mb-2">Total Commits</h6>
+                                    <h3 class="mb-0">{{ commits|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Assigned Tasks -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Assigned Tasks</h5>
+                </div>
+                <div class="card-body">
+                    {% if assigned_tasks %}
+                    <div class="list-group list-group-flush">
+                        {% for task in assigned_tasks %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ task.name }}</h6>
+                                    <small class="text-muted">
+                                        Due: {{ task.due_date.strftime('%b %d, %Y') }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-{% if task.status == 'Completed' %}success
+                                    {% elif task.status == 'In Progress' %}primary
+                                    {% else %}warning text-dark{% endif %}">
+                                    {{ task.status }}
+                                </span>
+                            </div>
+                            <div class="progress task-progress mt-2">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ task.progress }}%" 
+                                     aria-valuenow="{{ task.progress }}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle me-2"></i> No tasks assigned
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Commits -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Commits</h5>
+                    <small>{{ commits|length }} total</small>
+                </div>
+                <div class="card-body">
+                    {% if commits %}
+                    <div class="list-group list-group-flush">
+                        {% for commit in commits[:5] %}
+                        <div class="list-group-item commit-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ commit.message|truncate(50) }}</h6>
+                                    <small class="text-muted">
+                                        {{ commit.timestamp.strftime('%b %d, %Y %H:%M') }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-success">+{{ commit.additions }}</span>
+                                    <span class="badge bg-danger">-{{ commit.deletions }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle me-2"></i> No commits found
+                    </div>
+                    {% endif %}
+                </div>
+                {% if commits|length > 5 %}
+                <div class="card-footer text-center">
+                    <a href="#" class="btn btn-sm btn-outline-primary">
+                        View All Commits ({{ commits|length }})
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

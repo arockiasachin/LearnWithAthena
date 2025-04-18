@@ -1,0 +1,704 @@
+{% extends "teacher_base.html" %}
+
+{% block title %}Assignment Management{% endblock %}
+
+{% block extra_css %}
+<style>
+  .assignment-card {
+    border-left: 4px solid #dc3545;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .assignment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  .assignment-card .card-body {
+    padding: 1.25rem;
+    flex-grow: 1;
+  }
+  .assignment-badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+  }
+  .progress-thin {
+    height: 6px;
+  }
+  .assignment-type-icon {
+    font-size: 1.5rem;
+    color: #dc3545;
+  }
+
+  .assignment-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.assignment-card.expanded .assignment-details {
+  max-height: 500px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+  .due-date-indicator {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 20px;
+  }
+  .due-soon {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  .due-later {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .due-past {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  .assignment-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .cards-container {
+    position: relative;
+    min-height: 100px; /* Prevents layout jumps */
+  }
+
+  .visually-hidden-assignments {
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .visually-hidden-assignments.show-more-visible {
+    visibility: visible;
+    height: auto;
+    opacity: 1;
+    overflow: visible;
+  }
+
+  .assignment-card:hover .assignment-actions {
+    opacity: 1;
+  }
+  .view-toggle .btn {
+    border-radius: 0;
+  }
+  .view-toggle .btn:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+  .view-toggle .btn:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .kanban-column {
+    min-height: 500px;
+  }
+  .kanban-card {
+    cursor: grab;
+    margin-bottom: 10px;
+  }
+  .kanban-card:active {
+    cursor: grabbing;
+  }
+  /* New styles for expanded view and filters */
+  .assignment-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+  
+  .assignment-card.expanded .assignment-details {
+    max-height: 500px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+  }
+  .filter-container {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  .show-more-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .type-filter-btn.active {
+    background-color: #dc3545;
+    color: white;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set current_date = current_date if current_date is defined else now() %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Assignment Management</h2>
+  <div>
+    <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#newAssignmentModal">
+      <i class="bi bi-plus-lg me-2"></i> New Assignment
+    </button>
+    <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#courseScheduleModal">
+      <i class="bi bi-calendar-range me-2"></i> Schedule Course
+    </button>
+  </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="mb-4">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- Filter Section -->
+<div class="filter-container mb-4">
+  <h5>Filters</h5>
+  <div class="row">
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-secondary type-filter-btn active" data-type="all">
+        All Types
+      </button>
+      <button type="button" class="btn btn-outline-secondary type-filter-btn" data-type="Quiz">
+        <i class="bi bi-card-checklist me-1"></i> Quizzes
+      </button>
+      <button type="button" class="btn btn-outline-secondary type-filter-btn" data-type="Descriptive">
+        <i class="bi bi-file-text me-1"></i> Descriptive
+      </button>
+      <button type="button" class="btn btn-outline-secondary type-filter-btn" data-type="Coding">
+        <i class="bi bi-code me-1"></i> Coding
+      </button>
+      <button type="button" class="btn btn-outline-secondary type-filter-btn" data-type="Debugging">
+        <i class="bi bi-bug me-1"></i> Debugging
+      </button>
+    </div>
+    <div class="col-md-6">
+      <div class="mb-3">
+        <label class="form-label">Due Date</label>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-secondary due-filter-btn active" data-due="all">
+            All Dates
+          </button>
+          <button type="button" class="btn btn-outline-secondary due-filter-btn" data-due="upcoming">
+            Upcoming
+          </button>
+          <button type="button" class="btn btn-outline-secondary due-filter-btn" data-due="soon">
+            Due Soon (≤3 days)
+          </button>
+          <button type="button" class="btn btn-outline-secondary due-filter-btn" data-due="past">
+            Past Due
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Active Assignments</h5>
+          <div class="btn-group view-toggle" role="group">
+            <button type="button" class="btn btn-outline-secondary active" data-view="cards">
+              <i class="bi bi-grid"></i> Cards
+            </button>
+            <button type="button" class="btn btn-outline-secondary" data-view="list">
+              <i class="bi bi-list-ul"></i> List
+            </button>
+            <button type="button" class="btn btn-outline-secondary" data-view="kanban">
+              <i class="bi bi-kanban"></i> Kanban
+            </button>
+          </div>
+        </div>
+    
+        {% include "teacher/partials/_assignments_cards_view.html" %}
+    <!-- List View (Hidden by default) -->
+    <div class="d-none" id="list-view">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Subject</th>
+              <th>Type</th>
+              <th>Due Date</th>
+              <th>Submissions</th>
+              <th>Progress</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for assignment in assignments %}
+            <tr>
+              <td>
+                <strong>{{ assignment.title }}</strong>
+                <div class="text-muted small">{{ assignment.description|truncate(50) }}</div>
+              </td>
+              <td>{{ assignment.subject.name }}</td>
+              <td>
+                <span class="badge 
+                  {% if assignment.assignment_type == 'Quiz' %}bg-info
+                  {% elif assignment.assignment_type == 'Project' %}bg-warning text-dark
+                  {% elif assignment.assignment_type == 'Exam' %}bg-danger
+                  {% else %}bg-secondary{% endif %}">
+                  {{ assignment.assignment_type }}
+                </span>
+              </td>
+              <td>
+                <span class="{% if assignment.due_date.date() < current_date %}text-danger
+                            {% elif (assignment.due_date.date() - current_date).days <= 3 %}text-warning
+                            {% else %}text-success{% endif %}">
+                  {{ assignment.due_date.strftime('%b %d') }}
+                </span>
+              </td>
+              <td>
+                {{ assignment.submissions_count }} / {{ total_students }}
+              </td>
+              <td>
+                <div class="progress progress-thin">
+                  <div class="progress-bar bg-success" 
+                       role="progressbar" 
+                       style="width: {{ (assignment.submissions_count / total_students * 100) if total_students > 0 else 0 }}%" 
+                       aria-valuenow="{{ assignment.submissions_count }}" 
+                       aria-valuemin="0" 
+                       aria-valuemax="{{ total_students }}">
+                  </div>
+                </div>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-1">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Kanban View (Hidden by default) -->
+    <div class="d-none" id="kanban-view">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card border-primary kanban-column">
+            <div class="card-header bg-primary text-white">
+              <h6 class="mb-0"><i class="bi bi-list-task me-2"></i>Upcoming</h6>
+            </div>
+            <div class="card-body">
+              {% for assignment in assignments if assignment.due_date.date() > current_date and (assignment.due_date.date() - current_date).days > 3 %}
+              <div class="card kanban-card mb-3">
+                <div class="card-body">
+                  <h6 class="card-title">{{ assignment.title }}</h6>
+                  <div class="d-flex justify-content-between small text-muted">
+                    <span>{{ assignment.subject.name }}</span>
+                    <span>Due: {{ assignment.due_date.strftime('%b %d') }}</span>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-warning kanban-column">
+            <div class="card-header bg-warning text-dark">
+              <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Due Soon</h6>
+            </div>
+            <div class="card-body">
+              {% for assignment in assignments if assignment.due_date.date() > current_date and (assignment.due_date.date() - current_date).days <= 3 %}
+              <div class="card kanban-card mb-3">
+                <div class="card-body">
+                  <h6 class="card-title">{{ assignment.title }}</h6>
+                  <div class="d-flex justify-content-between small text-muted">
+                    <span>{{ assignment.subject.name }}</span>
+                    <span>Due: {{ assignment.due_date.strftime('%b %d') }}</span>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-danger kanban-column">
+            <div class="card-header bg-danger text-white">
+              <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Past Due</h6>
+            </div>
+            <div class="card-body">
+              {% for assignment in assignments if assignment.due_date.date() < current_date %}
+              <div class="card kanban-card mb-3">
+                <div class="card-body">
+                  <h6 class="card-title">{{ assignment.title }}</h6>
+                  <div class="d-flex justify-content-between small text-muted">
+                    <span>{{ assignment.subject.name }}</span>
+                    <span>Due: {{ assignment.due_date.strftime('%b %d') }}</span>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rest of your existing content (Saved Schedules and Assignment Details) -->
+<div class="row">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Saved Schedules</h5>
+        <div class="list-group list-group-flush">
+          {% for schedule in schedule_files %}
+          <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">{{ schedule.subject }}</h6>
+                <small class="text-muted">{{ schedule.created_at }}</small>
+              </div>
+              <div class="btn-group">
+                <a href="{{ url_for('teacher.view_schedule', filename=schedule.filename) }}" 
+                   class="btn btn-sm btn-outline-primary" target="_blank">
+                  <i class="bi bi-eye"></i> View
+                </a>
+                <form method="POST" action="{{ url_for('teacher.import_schedule', filename=schedule.filename) }}" class="d-inline">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-sm btn-outline-success import-schedule-btn">
+                    <i class="bi bi-upload"></i> Import
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="list-group-item">
+            <p class="text-muted mb-0">No saved schedules found</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Assignment Details</h5>
+        <p>Select an assignment or schedule to view details</p>
+        {% if selected_schedule %}
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th>Title</th>
+                <th>Due Date</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in selected_schedule %}
+              <tr>
+                <td>{{ item.module_num }}</td>
+                <td>{{ item.assignment_title }}</td>
+                <td>{{ item.due_date }}</td>
+                <td>{{ item.description }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include your existing modals here -->
+{% include "teacher/modals/new_assignment_modal.html" %}
+{% include "teacher/modals/course_schedule_modal.html" %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // View toggle functionality
+    const viewButtons = document.querySelectorAll('.view-toggle .btn');
+    const views = {
+      'cards': document.getElementById('cards-view'),
+      'list': document.getElementById('list-view'),
+      'kanban': document.getElementById('kanban-view')
+    };
+    
+    viewButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const view = this.getAttribute('data-view');
+        
+        // Toggle active class on buttons
+        viewButtons.forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Show selected view and hide others
+        Object.keys(views).forEach(key => {
+          if (key === view) {
+            views[key].classList.remove('d-none');
+            // Reapply filters when switching to cards view
+            if (key === 'cards') filterAssignments();
+          } else {
+            views[key].classList.add('d-none');
+          }
+        });
+      });
+    });
+    
+    // Import schedule confirmation
+    document.querySelectorAll('.import-schedule-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        if (!confirm('Import this schedule? This will create all assignments in the system.')) {
+          e.preventDefault();
+        }
+      });
+    });
+    
+    // Set default dates for schedule modal
+    const today = new Date();
+    const startDate = new Date(today.getFullYear(), 5, 2); // June 1 (month is 0-indexed)
+    const endDate = new Date(today.getFullYear(), 11, 1); // November 30
+    
+    function formatDate(date) {
+      const d = new Date(date);
+      return d.toISOString().split('T')[0];
+    }
+    
+    if (document.querySelector('#courseScheduleModal input[name="start_date"]')) {
+      document.querySelector('#courseScheduleModal input[name="start_date"]').value = formatDate(startDate);
+      document.querySelector('#courseScheduleModal input[name="end_date"]').value = formatDate(endDate);
+    }
+
+    // Combined view/details functionality
+    document.querySelectorAll('.view-assignment-btn, .toggle-details-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const assignmentId = this.getAttribute('data-assignment-id');
+        const card = this.closest('.assignment-card');
+        const details = document.getElementById(`details-${assignmentId}`);
+        
+        // Toggle expansion
+        card.classList.toggle('expanded');
+        
+        // Update button text/icon based on which button was clicked
+        if (this.classList.contains('view-assignment-btn')) {
+          if (card.classList.contains('expanded')) {
+            this.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Details';
+            // Scroll to show the expanded details if needed
+            details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          } else {
+            this.innerHTML = '<i class="bi bi-eye"></i> View Details';
+          }
+        } else {
+          // For backward compatibility with old toggle-details-btn
+          if (card.classList.contains('expanded')) {
+            this.innerHTML = '<i class="bi bi-arrows-angle-contract"></i> Hide';
+          } else {
+            this.innerHTML = '<i class="bi bi-arrows-angle-expand"></i> Details';
+          }
+        }
+      });
+    });
+
+    // Show more assignments functionality
+// Replace the show more button click handler
+const showMoreBtn = document.getElementById('show-more-btn');
+if (showMoreBtn) {
+  showMoreBtn.addEventListener('click', function() {
+    const moreAssignments = document.getElementById('more-assignments');
+    moreAssignments.classList.add('show-more-visible');
+    this.style.display = 'none';
+    
+    // Force layout recalculation if needed
+    void moreAssignments.offsetHeight;
+    
+    // Reapply filters if needed
+    if (typeof filterAssignments === 'function') {
+      filterAssignments();
+    }
+  });
+}
+
+    // Filter functionality
+    const typeFilterBtns = document.querySelectorAll('.type-filter-btn');
+    const dueFilterBtns = document.querySelectorAll('.due-filter-btn');
+    
+    typeFilterBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        typeFilterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        filterAssignments();
+      });
+    });
+    
+    dueFilterBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        dueFilterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        filterAssignments();
+      });
+    });
+    
+    function filterAssignments() {
+      const selectedType = document.querySelector('.type-filter-btn.active').getAttribute('data-type');
+      const selectedDue = document.querySelector('.due-filter-btn.active').getAttribute('data-due');
+      const activeView = document.querySelector('.view-toggle .btn.active').getAttribute('data-view');
+      const showMoreClicked = document.getElementById('more-assignments') && 
+                            !document.getElementById('more-assignments').classList.contains('d-none');
+      
+      // Elements to filter in different views
+      const elements = {
+        cards: document.querySelectorAll('.assignment-card-container'),
+        list: document.querySelectorAll('#list-view tbody tr'),
+        kanban: document.querySelectorAll('.kanban-card')
+      };
+    
+      let visibleCount = 0;
+      const maxInitialDisplay = 10;
+      let hasHiddenAssignments = false;
+    
+      // Hide all elements first
+      elements[activeView].forEach(el => {
+        el.style.display = 'none';
+      });
+    
+      // Process filtering for current view
+      elements[activeView].forEach(el => {
+        const typeMatch = selectedType === 'all' || el.getAttribute('data-type') === selectedType;
+        const dueMatch = selectedDue === 'all' || el.getAttribute('data-due') === selectedDue;
+    
+        if (typeMatch && dueMatch) {
+          // Determine display style based on view
+          const displayStyle = activeView === 'list' ? 'table-row' : 'block';
+          
+          // Show element if:
+          // 1. We're in list/kanban view, OR
+          // 2. Show more is clicked, OR
+          // 3. We haven't reached initial display limit
+          if (activeView !== 'cards' || showMoreClicked || visibleCount < maxInitialDisplay) {
+            el.style.display = displayStyle;
+            visibleCount++;
+          } else {
+            hasHiddenAssignments = true;
+          }
+        }
+      });
+    
+      // Handle show more button for cards view
+      const showMoreBtn = document.getElementById('show-more-btn');
+      if (showMoreBtn) {
+        if (activeView === 'cards' && hasHiddenAssignments && !showMoreClicked) {
+          showMoreBtn.style.display = 'block';
+          const hiddenCount = Array.from(elements.cards).filter(el => {
+            const typeMatch = selectedType === 'all' || el.getAttribute('data-type') === selectedType;
+            const dueMatch = selectedDue === 'all' || el.getAttribute('data-due') === selectedDue;
+            return typeMatch && dueMatch && el.style.display === 'none';
+          }).length;
+          
+          showMoreBtn.innerHTML = `<i class="bi bi-chevron-down me-1"></i> Show More (${hiddenCount} remaining)`;
+        } else {
+          showMoreBtn.style.display = 'none';
+        }
+      }
+    
+      // Special handling for kanban view
+      if (activeView === 'kanban') {
+        // Ensure columns are properly populated
+        const columns = {
+          upcoming: document.querySelector('.kanban-column:nth-child(1) .card-body'),
+          soon: document.querySelector('.kanban-column:nth-child(2) .card-body'),
+          past: document.querySelector('.kanban-column:nth-child(3) .card-body')
+        };
+    
+        // Clear columns first
+        Object.values(columns).forEach(col => col.innerHTML = '');
+    
+        // Rebuild with filtered assignments
+        elements.cards.forEach(card => {
+          const typeMatch = selectedType === 'all' || card.getAttribute('data-type') === selectedType;
+          const dueMatch = selectedDue === 'all' || card.getAttribute('data-due') === selectedDue;
+          
+          if (typeMatch && dueMatch) {
+            const dueStatus = card.getAttribute('data-due');
+            const cardClone = card.querySelector('.assignment-card').cloneNode(true);
+            if (columns[dueStatus]) {
+              columns[dueStatus].appendChild(cardClone);
+            }
+          }
+        });
+      }
+    }
+
+    // Initialize filters on page load
+    filterAssignments();
+    
+    // Close expanded cards when clicking outside
+    // Replace the existing details expansion code with this:
+    document.addEventListener('click', function(e) {
+      // Handle view details button click
+      if (e.target.closest('.view-assignment-btn')) {
+        const btn = e.target.closest('.view-assignment-btn');
+        const assignmentId = btn.getAttribute('data-assignment-id');
+        const card = btn.closest('.assignment-card');
+        const details = document.getElementById(`details-${assignmentId}`);
+        
+        card.classList.toggle('expanded');
+        
+        if (card.classList.contains('expanded')) {
+          btn.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Details';
+          details.style.maxHeight = details.scrollHeight + 'px';
+        } else {
+          btn.innerHTML = '<i class="bi bi-eye"></i> View Details';
+          details.style.maxHeight = null;
+        }
+      }
+      
+      // Prevent card click from propagating when clicking buttons
+      if (e.target.closest('.btn')) {
+        e.stopPropagation();
+      }
+    });
+
+    // Prevent event propagation when clicking inside cards
+    document.querySelectorAll('.assignment-card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %}

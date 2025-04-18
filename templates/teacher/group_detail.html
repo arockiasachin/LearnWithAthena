@@ -1,0 +1,327 @@
+{% extends "teacher_base.html" %}
+
+{% block title %}{{ group.name }} - Progress Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timeline-item {
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 20px;
+    }
+    .timeline-item:before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        width: 2px;
+        height: 100%;
+        background-color: #dee2e6;
+    }
+    .timeline-dot {
+        position: absolute;
+        left: 5px;
+        top: 5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+    .contribution-bar {
+        height: 20px;
+    }
+    .task-card {
+        transition: all 0.2s;
+    }
+    .task-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">{{ group.name }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('teacher.group_progress') }}">Groups</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ group.group_identifier }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="timePeriodDropdown" 
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                {% if time_period == 'week' %}Last Week
+                {% elif time_period == 'month' %}Last Month
+                {% else %}All Time{% endif %}
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="timePeriodDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('teacher.group_detail', group_id=group.group_id) }}?time_period=week">Last Week</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('teacher.group_detail', group_id=group.group_id) }}?time_period=month">Last Month</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('teacher.group_detail', group_id=group.group_id) }}">All Time</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Project Summary -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Project Summary</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-3">{{ project.name }}</h6>
+                    <p class="card-text text-muted">{{ project.description }}</p>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Overall Progress</span>
+                            <span>
+                                {{ (tasks|sum(attribute='task.progress')/tasks|length if tasks else 0)|round(1) }}%
+                            </span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ (tasks|sum(attribute='task.progress')/tasks|length if tasks else 0) }}%" 
+                                 aria-valuenow="{{ (tasks|sum(attribute='task.progress')/tasks|length if tasks else 0) }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded me-2">
+                                    <i class="bi bi-list-task text-primary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ tasks|length }}</h6>
+                                    <small class="text-muted">Tasks</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-success bg-opacity-10 p-2 rounded me-2">
+                                    <i class="bi bi-check-circle text-success"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ tasks|selectattr('task.status', 'equalto', 'Completed')|list|length }}</h6>
+                                    <small class="text-muted">Completed</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('teacher.export_contributions_csv', group_id=group.group_id) }}" 
+                       class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-download me-1"></i> Export Data
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Timeline -->
+        <div class="col-md-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Task Timeline</h5>
+                    <span class="badge bg-primary">
+                        {{ tasks|selectattr('recent_commits')|list|length }} Active Tasks
+                    </span>
+                </div>
+                <div class="card-body">
+                    {% if tasks %}
+                    <div class="timeline">
+                        {% for task_data in tasks %}
+                        <div class="timeline-item">
+                            <div class="timeline-dot bg-{% if task_data.task.status == 'Completed' %}success
+                                {% elif task_data.recent_commits %}primary
+                                {% else %}secondary{% endif %}"></div>
+                            <div class="card task-card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="card-title mb-1">{{ task_data.task.name }}</h6>
+                                            <small class="text-muted">
+                                                Due: {{ task_data.task.due_date.strftime('%b %d, %Y') }}
+                                            </small>
+                                        </div>
+                                        <span class="badge bg-{% if task_data.task.status == 'Completed' %}success
+                                            {% elif task_data.task.status == 'In Progress' %}primary
+                                            {% else %}warning text-dark{% endif %}">
+                                            {{ task_data.task.status }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="progress mt-2 mb-2" style="height: 6px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: {{ task_data.task.progress }}%" 
+                                             aria-valuenow="{{ task_data.task.progress }}" 
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- In group_detail.html, inside the task card div -->
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            {% for assignee in task_data.assignees %}
+                                            <img src="{{ assignee.github_avatar if assignee.github_avatar else '#' }}" 
+                                                class="rounded-circle" width="24" height="24"
+                                                alt="{{ assignee.name }}"
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="{{ assignee.name }}">
+                                            {% endfor %}
+                                        </div>
+                                        <div>
+                                            <small class="text-muted me-2">
+                                                {{ task_data.commit_count }} commits
+                                            </small>
+                                            <a href="{{ url_for('teacher.task_code_report', group_id=group.group_id, task_id=task_data.task.task_id) }}" 
+                                            class="btn btn-sm btn-outline-info">
+                                                <i class="bi bi-file-earmark-text"></i> Get Report
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle me-2"></i> No tasks found for this project
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Member Contributions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Member Contributions</h5>
+                <div>
+                    <a href="{{ url_for('teacher.enhanced_github_report', group_id=group.group_id) }}" 
+                       class="btn btn-sm btn-outline-info"
+                       target="_blank">
+                        <i class="bi bi-file-earmark-text me-1"></i> Group Code Report
+                    </a>
+                    <a href="{{ url_for('teacher.export_contributions_csv', group_id=group.group_id) }}" 
+                       class="btn btn-sm btn-outline-secondary ms-2">
+                        <i class="bi bi-download me-1"></i> Export
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <!-- Existing table header and body content remains the same -->
+                        <thead class="table-light">
+                            <tr>
+                                <th>Member</th>
+                                <th>Commits</th>
+                                <th>Lines Added</th>
+                                <th>Lines Deleted</th>
+                                <th>Last Activity</th>
+                                <th>Contribution</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mc in member_contributions %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if mc.student.github_avatar %}
+                                        <img src="{{ mc.student.github_avatar }}" 
+                                             class="rounded-circle me-2" width="32" height="32"
+                                             alt="{{ mc.student.name }}">
+                                        {% else %}
+                                        <div class="rounded-circle bg-light text-center me-2" 
+                                             style="width: 32px; height: 32px; line-height: 32px;">
+                                            {{ mc.student.name|first|upper }}
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="fw-medium">{{ mc.student.name }}</div>
+                                            <small class="text-muted">{{ mc.student.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ mc.commit_count }}</td>
+                                <td>{{ mc.lines_added }}</td>
+                                <td>{{ mc.lines_deleted }}</td>
+                                <td>
+                                    {% if mc.last_activity %}
+                                    {{ mc.last_activity.strftime('%b %d, %Y') }}
+                                    {% else %}
+                                    <span class="text-muted">None</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="progress contribution-bar">
+                                        {% set total_commits = member_contributions|sum(attribute='commit_count') %}
+                                        {% set contribution_pct = (mc.commit_count / total_commits * 100) if total_commits > 0 else 0 %}
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             style="width: {{ contribution_pct }}%" 
+                                             aria-valuenow="{{ contribution_pct }}" 
+                                             aria-valuemin="0" aria-valuemax="100">
+                                            {{ contribution_pct|round(1) }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('teacher.member_contributions', group_id=group.group_id, student_id=mc.student.id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            Details
+                                        </a>
+                                        <a href="{{ url_for('teacher.student_code_report', group_id=group.group_id, student_id=mc.student.id) }}" 
+                                           class="btn btn-sm btn-outline-info"
+                                           title="Code Analysis">
+                                            <i class="bi bi-code-slash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="alert alert-info mb-0">
+                                        <i class="bi bi-info-circle me-2"></i> No contribution data available
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

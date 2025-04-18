@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FSLSM Step {{ step }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #B9E5E8, #ffffff);
+      min-height: 100vh;
+    }
+    .quiz-card {
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      border: none;
+    }
+    .question-card {
+      background-color: #f8f9fa;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid #0d6efd;
+    }
+    .btn-next {
+      background-color: #0d6efd;
+      border-radius: 10px;
+      padding: 0.6rem 2rem;
+      font-weight: 600;
+    }
+    .progress {
+      height: 10px;
+      border-radius: 5px;
+    }
+    .progress-bar {
+      background-color: #0d6efd;
+    }
+  </style>
+</head>
+<body class="d-flex align-items-center">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card quiz-card">
+          <div class="card-body p-4 p-md-5">
+            <!-- Progress bar -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Step {{ step }} of 4</span>
+                <span>{{ (step/4)*100 }}%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar" style="width: {{ (step/4)*100 }}%"></div>
+              </div>
+            </div>
+
+            <h2 class="mb-4 text-center">{{ dimension }}</h2>
+            
+            <form method="POST">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              {% for q in questions %}
+                <div class="question-card">
+                  <h5 class="mb-3"><strong>Q{{ q.number }}.</strong> {{ q.question }}</h5>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="{{ q.number }}" id="q{{ q.number }}_a" value="a" required>
+                    <label class="form-check-label" for="q{{ q.number }}_a">
+                      {{ q.a }}
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="{{ q.number }}" id="q{{ q.number }}_b" value="b" required>
+                    <label class="form-check-label" for="q{{ q.number }}_b">
+                      {{ q.b }}
+                    </label>
+                  </div>
+                </div>
+              {% endfor %}
+              
+              <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary btn-next">
+                  {% if step == 4 %}Complete Quiz{% else %}Next Step{% endif %}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

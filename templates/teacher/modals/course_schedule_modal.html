@@ -1,0 +1,61 @@
+<div class="modal fade" id="courseScheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create Course Assignment Schedule</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="modal-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Subject</label>
+                <select class="form-select" name="subject_id" required>
+                  {% for subject in teacher_subjects %}
+                  <option value="{{ subject.id }}">{{ subject.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" name="start_date" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" name="end_date" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Syllabus Text</label>
+              <textarea class="form-control" rows="10" name="syllabus_text" required></textarea>
+              <small class="text-muted">Paste the course syllabus here to generate a schedule</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger" name="schedule_course">Generate Schedule</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date();
+      const startDate = new Date(today.getFullYear(), 5, 1); // June 1 (month is 0-indexed)
+      const endDate = new Date(today.getFullYear(), 10, 30); // November 30
+      
+      // Format as YYYY-MM-DD
+      function formatDate(date) {
+        const d = new Date(date);
+        return d.toISOString().split('T')[0];
+      }
+      
+      // Set default values
+      document.querySelector('#courseScheduleModal input[name="start_date"]').value = formatDate(startDate);
+      document.querySelector('#courseScheduleModal input[name="end_date"]').value = formatDate(endDate);
+    });
+    </script>

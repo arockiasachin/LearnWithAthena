@@ -1,0 +1,29 @@
+Week,Module Number,Module Title,Assignment Type,Assignment Title,Due Date,Description
+1,1,Design and Implementation of Relational Model,Quiz,Relational Model Fundamentals,2025-06-04,"15 MCQs testing understanding of relational algebra, normalization forms, and schema design principles. Covers first normal form through Boyce-Codd normal form."
+1,1,Design and Implementation of Relational Model,Descriptive,Normalization Trade-offs Analysis,2025-06-06,"400-word analysis comparing the practical implications of 3NF vs. BCNF in real-world database design, with examples from e-commerce systems."
+1,1,Design and Implementation of Relational Model,Coding,ER to Relational Mapping,2025-06-09,Implement a Python script that converts a given ER diagram (provided) into properly normalized relational tables following industry standards.
+1,1,Design and Implementation of Relational Model,Debugging,Normalization Errors Fix,2025-06-11,Identify and correct 4 intentional normalization errors in a provided hospital database schema that violates 3NF principles.
+2,2,Query Processing and Transaction Management,Quiz,Transaction ACID Properties,2025-06-11,"12 MCQs on transaction isolation levels, locking protocols, and query optimization techniques used in commercial DBMS."
+2,2,Query Processing and Transaction Management,Descriptive,Concurrency Control Analysis,2025-06-13,"500-word comparison of optimistic vs. pessimistic concurrency control strategies, with examples from banking transaction systems."
+2,2,Query Processing and Transaction Management,Coding,SQL Query Optimizer,2025-06-16,Implement a basic query optimizer in Python that rewrites SQL queries to use more efficient join orders based on table statistics.
+2,2,Query Processing and Transaction Management,Debugging,Deadlock Scenario Resolution,2025-06-18,Analyze and fix 3 deadlock scenarios in a provided multi-threaded database application using proper locking strategies.
+3,7,Database Security,Quiz,Security Fundamentals,2025-06-18,"10 MCQs on database security concepts including encryption, RBAC, and SQL injection prevention techniques."
+3,7,Database Security,Descriptive,GDPR Compliance Analysis,2025-06-20,300-word analysis of how database security features help achieve GDPR compliance in healthcare applications.
+3,7,Database Security,Coding,SQL Injection Protector,2025-06-23,Create a Python middleware that sanitizes user inputs and prevents common SQL injection attacks on web forms.
+3,7,Database Security,Debugging,Vulnerable Auth System Fix,2025-06-25,Identify and fix 5 security vulnerabilities in a provided database authentication system implementation.
+4,5,Semi-Structured Databases,Quiz,JSON/XML Concepts,2025-06-25,"12 MCQs on semi-structured data formats, schema validation, and query languages for document databases."
+4,5,Semi-Structured Databases,Descriptive,Document vs Relational Trade-offs,2025-06-27,450-word analysis comparing document database flexibility with relational database integrity for content management systems.
+4,5,Semi-Structured Databases,Coding,XML to JSON Converter,2025-06-30,Implement a Python utility that converts XML product catalogs to JSON format while preserving all hierarchical relationships.
+4,5,Semi-Structured Databases,Debugging,XPath Query Fixes,2025-07-02,Correct 4 problematic XPath queries in an e-commerce product filtering system that return incorrect results.
+5,4,Spatial and Multimedia Databases,Quiz,Spatial Data Concepts,2025-07-02,"10 MCQs on spatial indexing, geospatial queries, and multimedia content retrieval techniques."
+5,4,Spatial and Multimedia Databases,Descriptive,GIS Application Analysis,2025-07-04,"400-word evaluation of spatial database requirements for urban planning applications, covering indexing needs and query types."
+5,4,Spatial and Multimedia Databases,Coding,Nearest Neighbor Search,2025-07-07,Implement an R-tree based nearest neighbor search algorithm for restaurant locations using Python and PostGIS extensions.
+5,4,Spatial and Multimedia Databases,Debugging,Geospatial Query Optimization,2025-07-09,Identify and fix 3 performance issues in spatial queries for a ride-sharing application's location service.
+6,6,Cloud and NoSQL Databases,Quiz,NoSQL Fundamentals,2025-07-09,"15 MCQs covering CAP theorem, eventual consistency, and differences between document, key-value, and column-family stores."
+6,6,Cloud and NoSQL Databases,Descriptive,Scalability Trade-offs,2025-07-11,500-word analysis comparing horizontal scaling approaches in MongoDB vs. Cassandra for high-traffic web applications.
+6,6,Cloud and NoSQL Databases,Coding,Cassandra Data Model,2025-07-14,Design and implement a Cassandra data model for IoT sensor data that optimizes for time-series queries.
+6,6,Cloud and NoSQL Databases,Debugging,Sharding Configuration Fix,2025-07-16,Correct 3 configuration errors in a MongoDB sharded cluster setup that's causing uneven data distribution.
+7,3,Parallel and Distributed Databases,Quiz,Distributed Systems Concepts,2025-07-16,"12 MCQs on distributed query processing, two-phase commit protocol, and data fragmentation techniques."
+7,3,Parallel and Distributed Databases,Descriptive,Consistency Models Comparison,2025-07-18,"450-word analysis of strong vs. eventual consistency in globally distributed databases, with examples from financial systems."
+7,3,Parallel and Distributed Databases,Coding,Partition Tolerance Simulator,2025-07-21,Implement a Python simulation demonstrating how different distributed databases handle network partitions.
+7,3,Parallel and Distributed Databases,Debugging,Distributed Join Optimization,2025-07-23,Identify and fix 2 performance bottlenecks in distributed join operations across fragmented tables.

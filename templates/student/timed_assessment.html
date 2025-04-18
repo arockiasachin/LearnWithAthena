@@ -1,0 +1,106 @@
+{% extends "student_base.html" %}
+
+{% block title %}Timed Assessment: {{ assignment.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  #timer {
+    font-family: 'Courier New', monospace;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 5px;
+    display: inline-block;
+  }
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  .assessment-instructions {
+    border-left: 4px solid #0d6efd;
+    background-color: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">{{ assignment.title }}</h3>
+        <div id="timerDisplay">
+          <span id="timer" class="text-white">
+            {{ "%02d"|format((remaining_time // 60)|int }}:{{ "%02d"|format((remaining_time % 60)|int }}
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card-body">
+      <div class="assessment-instructions">
+        <h5><i class="bi bi-info-circle"></i> Assessment Instructions</h5>
+        <p class="mb-2">You have <strong>{{ assignment.time_limit_minutes }} minutes</strong> to complete this assessment.</p>
+        <p class="mb-0 text-danger"><i class="bi bi-exclamation-triangle"></i> The system will automatically submit your work when time expires.</p>
+      </div>
+      
+      <form method="POST" enctype="multipart/form-data" id="assessmentForm">
+        <div class="mb-3">
+          <label class="form-label">Your Response</label>
+          <textarea class="form-control" name="content" rows="12" required></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Supporting Files (Optional)</label>
+          <input type="file" class="form-control" name="file">
+          <div class="form-text">Upload any supporting documents (PDF, DOC, images)</div>
+        </div>
+        
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            <i class="bi bi-send-check"></i> Submit Assessment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Timer countdown
+  let timeLeft = {{ remaining_time }};
+  const timer = document.getElementById('timer');
+  const form = document.getElementById('assessmentForm');
+  
+  function updateTimer() {
+    const mins = Math.floor(timeLeft / 60);
+    const secs = Math.floor(timeLeft % 60);
+    
+    timer.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    
+    // Visual warnings
+    if (timeLeft < 120) {  // 2 minutes left
+      timer.classList.add('time-warning');
+    }
+    if (timeLeft < 30) {  // 30 seconds left
+      timer.classList.remove('time-warning');
+      timer.classList.add('time-critical');
+    }
+    
+    // Time expiration
+    if (timeLeft <= 0) {
+      timer.textContent = "00:00";
+      timer.innerHTML = '<i class="bi bi-exclamation-triangle"></i> TIME EXPIRED';
+      form.submit();
+    }
+    
+    timeLeft--;
+  }
+  
+  const timerInterval = setInterval(updateTimer, 1000);
+</script>
+{% endblock %}

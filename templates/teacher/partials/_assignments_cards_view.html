@@ -1,0 +1,24 @@
+<!-- templates/teacher/partials/_assignments_cards_view.html -->
+<div class="cards-container">
+    <div class="row g-3" id="cards-view">
+      {% for assignment in assignments[:9] %}
+        {% include "teacher/partials/_assignment_card.html" %}
+      {% endfor %}
+    
+      <!-- Hidden assignments - using visibility:hidden to maintain layout -->
+      <div class="row g-3 visually-hidden-assignments" id="more-assignments">
+        {% for assignment in assignments[9:] %}
+          {% include "teacher/partials/_assignment_card.html" %}
+        {% endfor %}
+      </div>
+    </div>
+    
+    <!-- Show More Button -->
+    {% if assignments|length > 9 %}
+    <div class="show-more-container mt-3">
+      <button id="show-more-btn" class="btn btn-outline-primary">
+        <i class="bi bi-chevron-down me-1"></i> Show More ({{ assignments|length - 9 }} remaining)
+      </button>
+    </div>
+    {% endif %}
+  </div>

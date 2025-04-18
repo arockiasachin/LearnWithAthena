@@ -1,0 +1,113 @@
+{% extends "student_base.html" %}
+
+{% block title %}Group Formation - Step 2{% endblock %}
+
+{% block content %}
+<div class="card profile-card">
+  <div class="progress mb-4">
+    <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+      Step 2 of 4
+    </div>
+  </div>
+  <div class="card-body">
+    <h4 class="mb-4">Step 2: Add Members</h4>
+    <div class="alert alert-info mb-4">
+      <i class="bi bi-info-circle"></i> You can only add members who share at least one subject with you
+    </div>
+    <form method="post" id="memberForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      
+      <div class="mb-3">
+        <label for="num_members" class="form-label">Number of Additional Members</label>
+        <select class="form-select" id="num_members" name="num_members" required>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+        <small class="form-text text-muted">Minimum 2 members required including yourself</small>
+      </div>
+      
+      <div id="memberFields" class="mb-4"></div>
+      
+      <button type="submit" class="btn btn-primary">Next</button>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const numMembersSelect = document.getElementById('num_members');
+  const memberFields = document.getElementById('memberFields');
+  
+  // Initial load
+  updateMemberFields();
+  
+  // Update fields when number changes
+  numMembersSelect.addEventListener('change', updateMemberFields);
+  
+  function updateMemberFields() {
+    const count = parseInt(numMembersSelect.value);
+    let html = '';
+    
+    for (let i = 1; i <= count; i++) {
+      html += `
+        <div class="border p-3 mb-3 rounded member-field" data-index="${i}">
+          <h5>Member ${i}</h5>
+          <div class="mb-3">
+            <label for="member_${i}" class="form-label">Select by Register Number</label>
+            <select name="member_${i}" class="form-select member-select" required>
+              <option value="">Select Register Number</option>
+              {% for student in students %}
+              <option value="{{ student.register_number }}">{{ student.register_number }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="student-info d-flex align-items-center mt-2" id="info_${i}">
+            <div class="text-muted">Select a register number to view details</div>
+          </div>
+        </div>
+      `;
+    }
+    
+    memberFields.innerHTML = html;
+    
+    // Add event listeners to new selects
+    document.querySelectorAll('.member-select').forEach(select => {
+      select.addEventListener('change', function() {
+        const index = this.name.split('_')[1];
+        const regNum = this.value;
+        
+        if (regNum) {
+          fetch(`/student/${regNum}/details`)
+            .then(response => response.json())
+            .then(data => {
+              const infoDiv = document.getElementById(`info_${index}`);
+              if (data.error) {
+                infoDiv.innerHTML = `<div class="text-danger">${data.error}</div>`;
+              } else {
+                infoDiv.innerHTML = `
+                  <div class="d-flex align-items-start">
+                    <img src="${data.avatar || '/static/images/default-avatar.png'}" 
+                         width="40" height="40" class="rounded-circle me-2">
+                    <div>
+                      <strong>${data.name}</strong><br>
+                      <small class="text-muted">${regNum}</small>
+                      <div class="mt-1">
+                        <small><strong>Subjects:</strong> ${data.subjects.join(', ')}</small>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }
+            });
+        } else {
+          document.getElementById(`info_${index}`).innerHTML = 
+            '<div class="text-muted">Select a register number to view details</div>';
+        }
+      });
+    });
+  }
+});
+</script>
+{% endblock %}

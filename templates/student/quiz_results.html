@@ -1,0 +1,34 @@
+<!-- templates/student/quiz_results.html -->
+{% extends "student_base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-header">
+            <h3>Quiz Results - {{ assignment.title }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Overall Performance</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            Score: {{ attempt.results.score }}%
+                        </li>
+                        <li class="list-group-item">
+                            Correct Answers: {{ attempt.results.correct_answers }}/{{ attempt.results.total_questions }}
+                        </li>
+                        <li class="list-group-item">
+                            Time Spent: {{ "%02d" % (attempt.time_spent // 60) }}:{{ "%02d" % (attempt.time_spent % 60) }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <a href="{{ url_for('student.view_assignments') }}" class="btn btn-primary mt-4">
+                Back to Assignments
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

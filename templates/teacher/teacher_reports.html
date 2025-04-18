@@ -1,0 +1,51 @@
+{% extends "teacher_base.html" %}
+
+{% block title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Reports & Analytics</h2>
+  <div class="btn-group">
+    <button class="btn btn-outline-danger dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      <i class="bi bi-download me-2"></i> Export
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="#">PDF</a></li>
+      <li><a class="dropdown-item" href="#">Excel</a></li>
+      <li><a class="dropdown-item" href="#">CSV</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Assignment Completion</h5>
+        <div style="height: 300px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+          <p class="text-muted">Chart would display here</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Group Performance</h5>
+        <div style="height: 300px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+          <p class="text-muted">Chart would display here</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Student Performance Overview</h5>
+    <div style="height: 400px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+      <p class="text-muted">Detailed performance chart would display here</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

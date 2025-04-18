@@ -1,0 +1,579 @@
+{% extends "student_base.html" %}
+
+{% block title %}Project Timeline - {{ project.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .task-form {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .form-section {
+        margin-bottom: 20px;
+    }
+    .assignee-select {
+        height: 150px;
+        overflow-y: auto;
+    }
+    .chart-container {
+        border: 1px solid #eee;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+        background: white;
+    }
+    .progress-card {
+        border-left: 4px solid #0d6efd;
+    }
+    .progress-tracker {
+        position: sticky;
+        top: 20px;
+    }
+    .member-progress {
+        height: 300px;
+        overflow-y: auto;
+    }
+    .csv-sample {
+        font-size: 0.85rem;
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        overflow-x: auto;
+    }
+    .task-badge {
+        font-size: 0.8rem;
+    }
+    .github-badge {
+        background-color: #24292e;
+        color: white;
+    }
+    .task-row:hover {
+        background-color: #f8f9fa;
+    }
+    .github-link {
+        color: #24292e;
+    }
+    .github-link:hover {
+        color: #0d6efd;
+    }
+    .csv-upload {
+        border: 2px dashed #dee2e6;
+        padding: 20px;
+        border-radius: 5px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .csv-upload:hover {
+        border-color: #0d6efd;
+    }
+    .import-options {
+        display: none;
+        margin-top: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-9">
+      <div class="card profile-card mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2>{{ project.name }} Timeline</h2>
+              <p class="text-muted mb-0">{{ project.description }}</p>
+            </div>
+            <div>
+              <span class="badge bg-primary">Group: {{ group.name }}</span>
+              {% if group.repo_details %}
+              <a href="{{ group.repo_details.github_repo_url }}" target="_blank" class="btn btn-sm github-badge ms-2">
+                <i class="bi bi-github"></i> GitHub Repo
+              </a>
+              <a href="{{ url_for('group.manual_sync') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-repeat"></i> Sync GitHub Data
+            </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Task Creation Tabs -->
+          <ul class="nav nav-tabs mb-3" id="taskTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab">
+                <i class="bi bi-pencil"></i> Manual Entry
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="csv-tab" data-bs-toggle="tab" data-bs-target="#csv" type="button" role="tab">
+                <i class="bi bi-file-earmark-spreadsheet"></i> CSV Import
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="taskTabsContent">
+            <!-- Manual Task Creation Form -->
+            <div class="tab-pane fade show active" id="manual" role="tabpanel">
+              <form method="POST" action="{{ url_for('group.project_timeline') }}" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label">Task Name <span class="text-danger">*</span></label>
+                    <input type="text" name="task_name" class="form-control" required>
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                    <input type="date" name="start_date" class="form-control" required
+                           min="{{ datetime.now().strftime('%Y-%m-%d') }}">
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Due Date <span class="text-danger">*</span></label>
+                    <input type="date" name="due_date" class="form-control" required
+                           min="{{ datetime.now().strftime('%Y-%m-%d') }}">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Dependencies (Task IDs)</label>
+                    <input type="text" name="dependencies" class="form-control" placeholder="e.g., 1,3,5">
+                    <small class="text-muted">Comma-separated list of task numbers</small>
+                  </div>
+                </div>
+                <div class="col-md-6 mt-3">
+                  <label class="form-label">Objectives</label>
+                  <textarea name="objectives" class="form-control" rows="2" 
+                            placeholder="Enter semicolon-separated objectives"></textarea>
+              </div>
+              <div class="col-md-6 mt-3">
+                  <label class="form-label">Outcomes</label>
+                  <textarea name="outcomes" class="form-control" rows="2"
+                            placeholder="Enter semicolon-separated measurable outcomes"></textarea>
+              </div>
+              
+                
+                <div class="row mt-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Assign To</label>
+                    <select name="assignees" multiple class="form-select assignee-select">
+                      {% for member in members %}
+                      <option value="{{ member.student.id }}">
+                        {{ member.student.name }} ({{ member.student.email }})
+                      </option>
+                      {% endfor %}
+                    </select>
+                    <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" rows="3"></textarea>
+                  </div>
+                </div>
+                
+                <div class="mt-3">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Add Task
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- CSV Import Form -->
+            <div class="tab-pane fade" id="csv" role="tabpanel">
+              <form method="POST" action="{{ url_for('group.project_timeline') }}" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="csv-upload">
+                  <div id="fileDropArea">
+                    <i class="bi bi-file-earmark-spreadsheet fs-1"></i>
+                    <h5>Upload CSV File</h5>
+                    <p class="text-muted">Drag & drop your CSV file here or click to browse</p>
+                    <input type="file" id="csv_file" name="csv_file" accept=".csv" class="d-none">
+                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('csv_file').click()">
+                      <i class="bi bi-upload"></i> Select File
+                    </button>
+                  </div>
+                  <div id="fileName" class="mt-2 fw-bold"></div>
+                </div>
+
+                <div class="import-options" id="importOptions">
+                  <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> CSV should include these columns:
+                    <strong>Task Name, Start Date, Due Date, Assigned Emails</strong>.
+                    Optional columns: <strong>Status, Progress, Dependencies, Description</strong>
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="createBranches" name="create_branches" checked>
+                    <label class="form-check-label" for="createBranches">
+                      Create GitHub branches for new tasks
+                    </label>
+                  </div>
+                  
+                  <div class="d-flex justify-content-between">
+                    <a href="#" class="btn btn-outline-secondary" id="downloadTemplate">
+                      <i class="bi bi-download"></i> Download Template
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="bi bi-upload"></i> Import Tasks
+                    </button>
+                  </div>
+                </div>
+              </form>
+              
+              <div class="csv-sample mt-4">
+                <h6>CSV Format Example:</h6>
+                <pre>Task Name,Start Date,Due Date,Assigned Emails,Status,Progress,Dependencies,Description,Objectives,Outcomes
+Project Setup,2023-01-10,2023-01-15,user1@example.com,Completed,100,,Initial project setup,"Define project scope;Establish repository structure","Documentation completed;Repo initialized"
+Database Design,2023-01-16,2023-01-20,user2@example.com,In Progress,50,Project Setup,Design database schema,"Normalize data structure;Optimize queries","ER diagram approved;Query response less than 100ms"
+API Development,2023-01-18,2023-01-25,"user1@example.com,user3@example.com",Not Started,0,Database Design,Develop REST API endpoints,"Implement authentication;Create documentation","Test coverage greater than 80%;Postman collection published"</pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Task List Section -->
+          <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4 class="mb-0">Project Tasks</h4>
+              <div>
+                <a href="{{ url_for('group.dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+              </div>
+            </div>
+            
+            {% if project.tasks %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Task</th>
+                    <th>Dates</th>
+                    <th>Status</th>
+                    <th>Progress</th>
+                    <th>GitHub</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for task in project.tasks %}
+                  <tr class="task-row">
+                    <td>
+                      <strong>{{ task.name }}</strong>
+                      {% if task.description %}
+                        <small class="d-block text-muted">{{ task.description }}</small>
+                      {% endif %}
+                      {% if task.assignments %}
+                        <div class="mt-1">
+                          {% for assignment in task.assignments %}
+                            <span class="badge bg-light text-dark">{{ assignment.student.name }}</span>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <small class="d-block">{{ task.start_date.strftime('%Y-%m-%d') }}</small>
+                      <small class="d-block">{{ task.due_date.strftime('%Y-%m-%d') }}</small>
+                    </td>
+                    <td>
+                      {% if task.objectives %}
+                      <div class="mt-2">
+                          <small class="fw-bold">Objectives:</small>
+                          <ul class="task-badge">
+                              {% for obj in task.objectives %}
+                              <li>{{ obj }}</li>
+                              {% endfor %}
+                          </ul>
+                      </div>
+                      {% endif %}
+                      
+                      {% if task.outcomes %}
+                      <div class="mt-2">
+                          <small class="fw-bold">Outcomes:</small>
+                          <ul class="task-badge">
+                              {% for out in task.outcomes %}
+                              <li>{{ out }}</li>
+                              {% endfor %}
+                          </ul>
+                      </div>
+                      {% endif %}
+                  </td>
+                    <td>
+                      <span class="badge 
+                        {% if task.status == 'Completed' %}bg-success
+                        {% elif task.status == 'In Progress' %}bg-warning text-dark
+                        {% else %}bg-secondary
+                        {% endif %}">
+                        {{ task.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="progress" style="height: 20px;">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: {{ task.progress }}%" 
+                             aria-valuenow="{{ task.progress }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                          {{ task.progress }}%
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {% if task.github_branch and group.repo_details %}
+                        <a href="{{ group.repo_details.github_repo_url }}/tree/{{ task.github_branch }}" 
+                           target="_blank" 
+                           class="github-link"
+                           title="View branch on GitHub">
+                          <i class="bi bi-github"></i>
+                        </a>
+                      {% endif %}
+                      {% if task.pr_url %}
+                        <a href="{{ task.pr_url }}" 
+                           target="_blank" 
+                           class="github-link ms-2"
+                           title="View Pull Request">
+                          <i class="bi bi-git"></i>
+                        </a>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% set is_assigned = task.assignments|selectattr('student.id', 'equalto', session['student_id'])|list %}
+                      {% if is_assigned %}
+                        <button class="btn btn-sm btn-outline-primary" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#editTaskModal"
+                                data-task-id="{{ task.task_id }}"
+                                data-task-status="{{ task.status }}"
+                                data-task-progress="{{ task.progress }}">
+                          <i class="bi bi-pencil"></i> Edit
+                        </button>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle"></i> No tasks found. Create your first task above.
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Tracker Sidebar -->
+    <div class="col-lg-3">
+      <div class="progress-tracker">
+        <div class="card mb-4">
+          <div class="card-body progress-card">
+            <h5 class="card-title">Project Progress</h5>
+            <div class="d-flex align-items-center mb-3">
+              <div class="progress w-100" style="height: 20px;">
+                <div class="progress-bar" role="progressbar" 
+                     style="width: {{ project_progress }}%" 
+                     aria-valuenow="{{ project_progress }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+              </div>
+              <span class="ms-2 fw-bold">{{ project_progress }}%</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">{{ tasks|length }} tasks</span>
+              <span class="text-muted">
+                {{ tasks|selectattr('status', 'equalto', 'Completed')|list|length }} completed
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Team Progress</h5>
+            <div class="member-progress">
+              {% if member_progress %}
+                {% for member in member_progress %}
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span>{{ member.Member }}</span>
+                    <span class="fw-bold">{{ member.Progress|round(1) }}%</span>
+                  </div>
+                  <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-success" 
+                         role="progressbar" 
+                         style="width: {{ member.Progress }}%">
+                    </div>
+                  </div>
+                  <small class="text-muted">{{ member.TaskCount }} tasks assigned</small>
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="alert alert-info">
+                  <i class="bi bi-info-circle"></i> No tasks assigned yet
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- GitHub Activity Card -->
+        <div class="card mt-4">
+          <div class="card-body">
+            <h5 class="card-title">GitHub Activity</h5>
+            {% if group.repo_details %}
+              <div class="d-flex justify-content-between mb-2">
+                <span>Recent Commits:</span>
+                <span class="badge bg-secondary">
+                  {{ project.tasks|sum(attribute='commit_count') }}
+                </span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Open PRs:</span>
+                <span class="badge bg-secondary">
+                  {{ project.tasks|selectattr('pr_url')|list|length }}
+                </span>
+              </div>
+              <a href="{{ group.repo_details.github_repo_url }}/pulls" 
+                 target="_blank" 
+                 class="btn btn-sm btn-outline-dark w-100 mt-2">
+                <i class="bi bi-git"></i> View Pull Requests
+              </a>
+            {% else %}
+              <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> No GitHub repo connected
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="" id="editTaskForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              <option value="Not Started">Not Started</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Progress (%)</label>
+            <input type="number" name="progress" class="form-control" min="0" max="100" value="0">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle edit task modal
+  const editTaskModal = document.getElementById('editTaskModal');
+  const editTaskForm = document.getElementById('editTaskForm');
+  
+  editTaskModal.addEventListener('show.bs.modal', function(event) {
+    const button = event.relatedTarget;
+    const taskId = button.getAttribute('data-task-id');
+    const status = button.getAttribute('data-task-status');
+    const progress = button.getAttribute('data-task-progress');
+    
+    // Update form action URL
+    editTaskForm.action = "{{ url_for('group.update_task', task_id=0) }}".replace('0', taskId);
+    
+    // Set current values
+    editTaskForm.querySelector('select[name="status"]').value = status;
+    editTaskForm.querySelector('input[name="progress"]').value = progress;
+  });
+
+  // GitHub link tooltips
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+
+  // CSV file upload handling
+  const csvFileInput = document.getElementById('csv_file');
+  const fileNameDisplay = document.getElementById('fileName');
+  const importOptions = document.getElementById('importOptions');
+  const fileDropArea = document.getElementById('fileDropArea');
+  
+  // Handle file selection
+  csvFileInput.addEventListener('change', function(e) {
+    if (this.files.length > 0) {
+      fileNameDisplay.textContent = this.files[0].name;
+      importOptions.style.display = 'block';
+    } else {
+      fileNameDisplay.textContent = '';
+      importOptions.style.display = 'none';
+    }
+  });
+
+  // Drag and drop functionality
+  fileDropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    fileDropArea.style.borderColor = '#0d6efd';
+    fileDropArea.style.backgroundColor = 'rgba(13, 110, 253, 0.1)';
+  });
+
+  fileDropArea.addEventListener('dragleave', () => {
+    fileDropArea.style.borderColor = '#dee2e6';
+    fileDropArea.style.backgroundColor = '';
+  });
+
+  fileDropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileDropArea.style.borderColor = '#dee2e6';
+    fileDropArea.style.backgroundColor = '';
+    
+    if (e.dataTransfer.files.length) {
+      csvFileInput.files = e.dataTransfer.files;
+      fileNameDisplay.textContent = e.dataTransfer.files[0].name;
+      importOptions.style.display = 'block';
+    }
+  });
+
+  // Download template
+  document.getElementById('downloadTemplate').addEventListener('click', function(e) {
+    e.preventDefault();
+    const csvContent = "Task Name,Start Date,Due Date,Assigned Emails,Status,Progress,Dependencies,Description\n" +
+                       "Project Setup,2023-01-10,2023-01-15,user1@example.com,Completed,100,,Initial project setup\n" +
+                       "Database Design,2023-01-16,2023-01-20,user2@example.com,In Progress,50,Project Setup,Design database schema\n" +
+                       "API Development,2023-01-18,2023-01-25,\"user1@example.com,user3@example.com\",Not Started,0,Database Design,Develop REST API endpoints";
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'task_template.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+});
+</script>
+{% endblock %}

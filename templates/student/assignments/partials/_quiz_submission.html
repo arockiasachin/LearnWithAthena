@@ -1,0 +1,40 @@
+<!-- templates/student/assignments/partials/_quiz_submission.html -->
+<h5 class="mb-3"><i class="bi bi-upload me-2"></i>Your Submission</h5>
+
+{% if submission %}
+<div class="card submission-status h-100
+          {% if submission.status == 'graded' %}submission-graded
+          {% else %}submission-pending{% endif %}">
+  <div class="card-body">
+    {% include 'student/assignments/partials/_submission_status.html' %}
+    
+    <div class="action-buttons mt-3">
+      <a href="{{ url_for('student.view_submission', submission_id=submission.id) }}" 
+         class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-eye me-1"></i> View Submission
+      </a>
+      
+      {% if assignment.due_date.date() >= current_date or assignment.allow_late_submissions %}
+        {% include 'student/assignments/partials/_quiz_generation_button.html' %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="card quiz-info-card h-100">
+  <div class="card-body text-center py-4">
+    <i class="bi bi-question-circle-fill text-info" style="font-size: 2rem;"></i>
+    <h5 class="mt-3">Quiz Assignment</h5>
+    <p class="text-muted mb-4">Generate a practice quiz based on this assignment</p>
+    
+    {% if assignment.due_date.date() >= current_date or assignment.allow_late_submissions %}
+      {% include 'student/assignments/partials/_quiz_generation_button.html' %}
+      <p class="small text-muted mt-2">This will create a CSV file with quiz questions</p>
+    {% else %}
+      <button class="btn btn-secondary disabled">
+        <i class="bi bi-lock me-1"></i> Submission Closed
+      </button>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

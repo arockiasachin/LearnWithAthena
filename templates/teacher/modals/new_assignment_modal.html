@@ -1,0 +1,63 @@
+<div class="modal fade" id="newAssignmentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create New Assignment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Assignment Title</label>
+            <input type="text" class="form-control" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" rows="3" name="description" required></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Due Date</label>
+              <input type="date" class="form-control" name="due_date" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Subject</label>
+              <select class="form-select" name="subject_id" required>
+                {% for subject in teacher_subjects %}
+                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Assignment Type</label>
+              <select class="form-select" name="assignment_type" required>
+                <option value="Quiz">Quiz</option>
+                <option value="Descriptive">Descriptive</option>
+                <option value="Coding">Coding</option>
+                <option value="Debugging">Debugging</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Total Points</label>
+              <input type="number" class="form-control" name="total_points" min="1" value="100" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="publishToggle" name="is_published" checked>
+              <label class="form-check-label" for="publishToggle">Publish immediately</label>
+            </div>
+            <small class="text-muted">If unchecked, assignment will be saved as draft</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger" name="create_assignment">Create Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+<!-- templates/teacher/partials/_assignment_card.html -->
+<div class="col-md-6 col-lg-4 assignment-card-container" 
+     data-type="{{ assignment.assignment_type }}"
+     data-due="{% if assignment.due_date.date() < current_date %}past{% elif (assignment.due_date.date() - current_date).days <= 3 %}soon{% else %}upcoming{% endif %}">
+  <div class="card assignment-card">
+    <div class="card-body">
+      <!-- Card header with title and icon -->
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h5 class="card-title mb-1">{{ assignment.title }}</h5>
+          <span class="badge bg-secondary assignment-badge mb-2">{{ assignment.subject.name }}</span>
+        </div>
+        <div>
+          {% if assignment.assignment_type == 'Quiz' %}
+          <i class="bi bi-card-checklist assignment-type-icon"></i>
+        {% elif assignment.assignment_type == 'Descriptive' %}
+          <i class="bi bi-file-text assignment-type-icon"></i>
+        {% elif assignment.assignment_type == 'Coding' %}
+          <i class="bi bi-code assignment-type-icon"></i>
+        {% elif assignment.assignment_type == 'Debugging' %}
+          <i class="bi bi-bug assignment-type-icon"></i>
+        {% endif %}
+        </div>
+      </div>
+      
+      <!-- Description -->
+      <p class="card-text text-muted small mb-3">{{ assignment.description|truncate(100) }}</p>
+      
+      <!-- Due date and submission info -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="due-date-indicator 
+                    {% if assignment.due_date.date() < current_date %}due-past
+                    {% elif (assignment.due_date.date() - current_date).days <= 3 %}due-soon
+                    {% else %}due-later{% endif %}">
+          <i class="bi bi-calendar-event me-1"></i>
+          Due: {{ assignment.due_date.strftime('%b %d, %Y') }}
+        </span>
+        <span class="text-muted small">
+          {{ assignment.submissions_count }} of {{ total_students }} submitted
+        </span>
+      </div>
+      
+      <!-- Progress bar -->
+      <div class="progress progress-thin mb-2">
+        <div class="progress-bar bg-success" 
+             role="progressbar" 
+             style="width: {{ (assignment.submissions_count / total_students * 100) if total_students > 0 else 0 }}%" 
+             aria-valuenow="{{ assignment.submissions_count }}" 
+             aria-valuemin="0" 
+             aria-valuemax="{{ total_students }}">
+        </div>
+      </div>
+      
+      <!-- Actions -->
+<!-- Replace the actions section with this: -->
+      <div class="d-flex justify-content-between assignment-actions">
+        <button class="btn btn-sm btn-outline-primary me-2 view-assignment-btn" data-assignment-id="{{ assignment.id }}">
+          <i class="bi bi-eye"></i> View Details
+        </button>
+        <button class="btn btn-sm btn-outline-danger delete-assignment-btn" data-assignment-id="{{ assignment.id }}">
+          <i class="bi bi-trash"></i> Delete
+        </button>
+      </div>
+      <!-- Expanded Details Section -->
+      <div class="assignment-details" id="details-{{ assignment.id }}">
+        <div class="mt-3">
+          <h6>Full Description</h6>
+          <p>{{ assignment.description }}</p>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Details</h6>
+              <ul class="list-unstyled small">
+                <li><strong>Type:</strong> {{ assignment.assignment_type }}</li>
+                <li><strong>Created:</strong> {{ assignment.created_at.strftime('%b %d, %Y') }}</li>
+                <li><strong>Total Points:</strong> {{ assignment.total_points }}</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6>Submission Stats</h6>
+              <ul class="list-unstyled small">
+                <li><strong>Submitted:</strong> {{ assignment.submissions_count }} ({{ ((assignment.submissions_count / total_students) * 100) if total_students > 0 else 0 | round(1) }}%)</li>
+                <li><strong>Average Score:</strong> {{ assignment.average_score | round(1) if assignment.average_score else 'N/A' }}/{{ assignment.total_points }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

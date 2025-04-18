@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CollabEdu{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    .sidebar {
+      transition: all 0.3s ease;
+      background-color: #f8f9fa;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+    }
+    
+    .main-content {
+      padding: 20px;
+      background-color: #fff;
+    }
+    
+    .profile-card {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: none;
+      transition: transform 0.3s;
+      margin-bottom: 20px;
+    }
+    
+    .profile-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .nav-pills .nav-link {
+      color: #495057;
+      font-weight: 500;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+    
+    .nav-pills .nav-link.active {
+      background-color: #0d6efd;
+      color: white;
+    }
+    
+    .nav-pills .nav-link:hover:not(.active) {
+      background-color: #e9ecef;
+    }
+    
+    .dashboard-nav {
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1020;
+    }
+    
+    .sidebar-collapsed {
+      width: 0;
+      overflow: hidden;
+      padding: 0;
+    }
+    
+    @media (max-width: 992px) {
+      .sidebar {
+        position: fixed;
+        z-index: 1000;
+        width: 280px;
+        left: -280px;
+      }
+      
+      .sidebar.show {
+        left: 0;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+    }
+    
+    /* Animation for sidebar toggle */
+    @keyframes slideIn {
+      from { left: -280px; }
+      to { left: 0; }
+    }
+    
+    @keyframes slideOut {
+      from { left: 0; }
+      to { left: -280px; }
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <div class="container mt-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+  <!-- Modern Navbar with Hamburger -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary dashboard-nav">
+    <div class="container-fluid">
+      <button class="navbar-toggler me-2" type="button" onclick="toggleSidebar()">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand fw-bold" href="{{ url_for('auth.student_dashboard') }}">CollabEdu</a>
+      <div class="d-flex align-items-center ms-auto">
+        <span class="text-white me-3 d-none d-sm-inline">Welcome, {{ session['student_name'] }}</span>
+        <a href="/logout" class="btn btn-outline-light">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar Navigation -->
+      <div class="col-lg-3 col-xl-2 sidebar p-0" id="sidebar">
+        <div class="p-3">
+          <!-- Profile Card -->
+          <div class="card profile-card">
+            <div class="card-body text-center position-relative">
+              <!-- Completion Status Indicator -->
+              <div class="position-absolute top-0 start-0 m-2">
+                {% if current_student.profile_complete %}
+                  <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                {% else %}
+                  <i class="bi bi-person-fill text-primary fs-5"></i>
+                {% endif %}
+              </div>
+
+              <!-- Profile Picture -->
+              {% if current_student.github_avatar %}
+                <img src="{{ current_student.github_avatar }}" 
+                     class="rounded-circle mb-3" 
+                     style="width: 80px; height: 80px; object-fit: cover;"
+                     alt="Profile Picture">
+              {% else %}
+                <div class="mx-auto mb-3 bg-light rounded-circle d-flex align-items-center justify-content-center" 
+                     style="width: 80px; height: 80px;">
+                  <i class="bi bi-person-fill text-secondary fs-3"></i>
+                </div>
+              {% endif %}
+              
+              <h5 class="mb-1">{{ session['student_name'] }}</h5>
+              <p class="text-muted mb-3">Student</p>
+
+              <!-- Profile Completion -->
+              <div class="d-grid">
+                {% if current_student.profile_complete %}
+                  <a href="{{ url_for('student.view_profile') }}" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-person-check me-1"></i> View Profile
+                  </a>
+                {% else %}
+                  <a href="{{ url_for('student.update_profile') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-person-plus me-1"></i> Complete Profile
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Menu -->
+          <ul class="nav nav-pills flex-column">
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == url_for('auth.student_dashboard') %}active{% endif %}" 
+                 href="{{ url_for('auth.student_dashboard') }}">
+                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == url_for('quiz.quiz_dashboard') %}active{% endif %}" 
+                 href="{{ url_for('quiz.quiz_dashboard') }}">
+                <i class="bi bi-clipboard2-pulse me-2"></i>Learning Style Quiz
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == url_for('auth.student_courses') %}active{% endif %}" 
+                 href="#">
+                <i class="bi bi-journal-bookmark me-2"></i>Courses
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == url_for('student.view_assignments') %}active{% endif %}" 
+                 href="{{ url_for('student.view_assignments') }}">
+                <i class="bi bi-journal-text me-2"></i>Assignments
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == url_for('marks.view_marks') %}active{% endif %}" 
+                 href="{{ url_for('marks.view_marks') }}">
+                <i class="bi bi-journal-check me-2"></i>Marks
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if 'group' in request.path %}active{% endif %}" 
+                 href="{% if has_group %}{{ url_for('group.dashboard') }}{% else %}{{ url_for('group.formation.formation_step1') }}{% endif %}">
+                <i class="bi bi-people-fill me-2"></i>
+                {% if has_group %}Group Dashboard{% else %}Create Group{% endif %}
+              </a>
+            </li>
+            
+            {% if has_group and 'group' in request.path %}
+              <li class="nav-item">
+                <a class="nav-link {% if request.path == url_for('group.member_details') %}active{% endif %}" 
+                   href="{{ url_for('group.member_details') }}">
+                  <i class="bi bi-person-lines-fill me-2"></i>Member Details
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.path == url_for('group.project_details') %}active{% endif %}" 
+                   href="{{ url_for('group.project_details') }}">
+                  <i class="bi bi-kanban-fill me-2"></i>Project Details
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.path == url_for('group.project_timeline') %}active{% endif %}" 
+                   href="{{ url_for('group.project_timeline') }}">
+                  <i class="bi bi-gantt-chart me-2"></i>Project Timeline
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.path == url_for('group.group_assessments') %}active{% endif %}" 
+                   href="{{ url_for('group.group_assessments') }}">
+                  <i class="bi bi-clipboard2-data-fill me-2"></i>Group Evaluations
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.path == url_for('group.submissions') %}active{% endif %}" 
+                   href="{{ url_for('group.submissions') }}">
+                  <i class="bi bi-upload me-2"></i>Submissions
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-lg-9 col-xl-10 main-content" id="mainContent">
+        {% block content %}{% endblock %}
+        
+        <footer class="bg-light py-4 mt-5">
+          <div class="container text-center text-muted">
+            <p class="mb-0">© 2025 CollabEdu. All rights reserved.</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+      
+      if (window.innerWidth < 992) {
+        // Mobile view - toggle sidebar with animation
+        sidebar.classList.toggle('show');
+        
+        if (sidebar.classList.contains('show')) {
+          sidebar.style.animation = 'slideIn 0.3s forwards';
+          mainContent.style.opacity = '0.7';
+        } else {
+          sidebar.style.animation = 'slideOut 0.3s forwards';
+          mainContent.style.opacity = '1';
+        }
+      } else {
+        // Desktop view - simple collapse
+        sidebar.classList.toggle('sidebar-collapsed');
+        if (sidebar.classList.contains('sidebar-collapsed')) {
+          mainContent.classList.add('col-lg-12', 'col-xl-12');
+          mainContent.classList.remove('col-lg-9', 'col-xl-10');
+        } else {
+          mainContent.classList.remove('col-lg-12', 'col-xl-12');
+          mainContent.classList.add('col-lg-9', 'col-xl-10');
+        }
+      }
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.querySelector('.navbar-toggler');
+      
+      if (window.innerWidth < 992 && 
+          sidebar.classList.contains('show') &&
+          !sidebar.contains(event.target) && 
+          !hamburger.contains(event.target)) {
+        toggleSidebar();
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+      
+      if (window.innerWidth >= 992) {
+        // Desktop - ensure sidebar is visible
+        sidebar.classList.remove('show');
+        sidebar.style.animation = '';
+        mainContent.style.opacity = '1';
+        mainContent.classList.remove('col-lg-12', 'col-xl-12');
+        mainContent.classList.add('col-lg-9', 'col-xl-10');
+      } else {
+        // Mobile - ensure sidebar is hidden by default
+        sidebar.classList.remove('show', 'sidebar-collapsed');
+      }
+    });
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

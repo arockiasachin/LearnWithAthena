@@ -1,0 +1,166 @@
+{% extends "student_base.html" %}
+
+{% block title %}Group Evaluations - {{ group.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .evaluation-avatar {
+        width: 36px;
+        height: 36px;
+        object-fit: cover;
+    }
+    .progress-thin {
+        height: 8px;
+        border-radius: 4px;
+    }
+    .rating-badge {
+        min-width: 60px;
+    }
+    .evaluation-row:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card profile-card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Group Evaluations</h2>
+      <div>
+        <span class="badge bg-primary me-2">Group: {{ group.name }}</span>
+        <span class="badge bg-secondary">{{ group.group_identifier }}</span>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Peer Assessments</h5>
+        <a href="#" class="btn btn-sm btn-light">
+          <i class="bi bi-plus-circle me-1"></i> New Evaluation
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info d-flex align-items-center">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          <div>
+            <strong>Evaluation Guidelines:</strong> Rate each member's contribution (1-5 scale) based on:
+            <ul class="mb-0 mt-2">
+              <li>Quality of work</li>
+              <li>Timeliness</li>
+              <li>Team collaboration</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="table-light">
+              <tr>
+                <th>Member</th>
+                <th>Last Evaluated</th>
+                <th>Average Rating</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for member in group.members %}
+              <tr class="evaluation-row align-middle">
+                <td>
+                  <div class="d-flex align-items-center">
+                    {% if member.student.github_avatar %}
+                      <img src="{{ member.student.github_avatar }}" 
+                           class="rounded-circle evaluation-avatar me-2" 
+                           alt="{{ member.student.name }}">
+                    {% else %}
+                      <span class="member-avatar">{{ member.student.name|first|upper }}</span>
+                    {% endif %}
+                    <div>
+                      <div class="fw-medium">{{ member.student.name }}</div>
+                      <small class="text-muted">{{ member.role|title }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {% if loop.index % 2 %}
+                    <span class="text-success">Yesterday</span>
+                  {% else %}
+                    <span class="text-muted">Never</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="progress progress-thin flex-grow-1 me-2">
+                      <div class="progress-bar bg-success" 
+                           style="width: {{ [65, 75, 85, 90, 95]|random }}%"></div>
+                    </div>
+                    <span class="badge bg-success rating-badge">
+                      {{ "%.1f"|format([3.5, 4.0, 4.5, 5.0]|random) }}/5.0
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-{% if loop.index % 2 %}success{% else %}warning{% endif %}">
+                    {% if loop.index % 2 %}Completed{% else %}Pending{% endif %}
+                  </span>
+                </td>
+                <td>
+                  <a href="#" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-clipboard2-pulse me-1"></i>
+                    {% if loop.index % 2 %}Re-evaluate{% else %}Evaluate{% endif %}
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Instructor Feedback</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-warning d-flex align-items-center">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <div>
+            <strong>No feedback received yet</strong> from your instructor. 
+            Check back after your next submission deadline.
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-outline-primary">
+            <i class="bi bi-question-circle me-1"></i> Request Feedback
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    // Make avatars clickable to profiles
+    document.querySelectorAll('.evaluation-avatar').forEach(avatar => {
+        avatar.style.cursor = 'pointer';
+        avatar.addEventListener('click', function() {
+            const memberName = this.alt;
+            alert(`Viewing profile for ${memberName}`);
+            // In a real app, this would navigate to the member's profile
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

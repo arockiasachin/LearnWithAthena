@@ -1,0 +1,38 @@
+# --- Core Libraries ---
+numpy
+pandas
+uuid  # standard lib, no need to install
+ast   # standard lib, no need to install
+
+# --- Qdrant + Embeddings ---
+qdrant-client
+fastembed
+langchain-qdrant
+langchain-openai
+langchain-community
+langchain-core
+
+# --- OpenAI, Google, Cohere, Voyage ---
+openai
+google-generativeai
+langchain-google-genai
+langchain-google-vertexai
+langchain-cohere
+voyageai
+langchain-voyageai
+
+# --- DeepSeek ---
+langchain-deepseek
+
+# --- Evaluation & Analysis ---
+ragas
+datasets
+deepeval
+instructor
+
+# --- Transformers, Filtering, Reranking ---
+jina
+
+# --- Prompting & Text Processing ---
+lark
+pydantic

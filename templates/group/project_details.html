@@ -1,0 +1,71 @@
+{% extends "student_base.html" %}
+
+{% block title %}Project Details - {{ group.name }}{% endblock %}
+
+{% block content %}
+<div class="card profile-card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Project Details</h2>
+      <span class="badge bg-primary">Group: {{ group.name }}</span>
+    </div>
+
+    {% if group.projects %}
+      {% for project in group.projects %}
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">{{ project.name }}</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-4">
+            <h6>Description</h6>
+            <p>{{ project.description or "No description provided" }}</p>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <h6>Technology Stack</h6>
+              {% if project.tech_stack %}
+                <div class="d-flex flex-wrap gap-2">
+                  {% for tech in project.tech_stack.split(',') %}
+                  <span class="badge bg-info">{{ tech }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="text-muted">No technologies specified</p>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <h6>Status</h6>
+              <span class="badge bg-{% if project.status == 'completed' %}success{% elif project.status == 'in-progress' %}warning{% else %}secondary{% endif %}">
+                {{ project.status|title }}
+              </span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <h6>Milestones</h6>
+            {% if project.milestones %}
+              <ul class="list-group">
+                {% for milestone in project.milestones.split(',') %}
+                <li class="list-group-item">{{ milestone }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="text-muted">No milestones defined</p>
+            {% endif %}
+          </div>
+
+          <a href="#" class="btn btn-primary mt-3">Edit Project</a>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="alert alert-info">
+        No projects created yet. <a href="{{ url_for('group.formation.formation_step3') }}">Create a project</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

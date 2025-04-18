@@ -1,0 +1,100 @@
+<!-- templates/student/assignments/partials/_assignment_card.html -->
+<div class="col" 
+     data-due-status="{% if assignment.due_date.date() < current_date %}past{% elif (assignment.due_date.date() - current_date).days <= 3 %}soon{% else %}upcoming{% endif %}"
+     data-assignment-type="{{ assignment.assignment_type }}">
+  <div class="card assignment-card h-100">
+    <div class="card-body d-flex flex-column">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h5 class="card-title mb-1">{{ assignment.title }}</h5>
+          <span class="badge bg-secondary assignment-badge">{{ assignment.subject.name }}</span>
+        </div>
+        <div>
+          {% if assignment.assignment_type == 'Quiz' %}
+            <i class="bi bi-card-checklist assignment-type-icon"></i>
+          {% elif assignment.assignment_type == 'Descriptive' %}
+            <i class="bi bi-file-text assignment-type-icon"></i>
+          {% elif assignment.assignment_type == 'Coding' %}
+            <i class="bi bi-code assignment-type-icon"></i>
+          {% elif assignment.assignment_type == 'Debugging' %}
+            <i class="bi bi-bug assignment-type-icon"></i>
+          {% endif %}
+        </div>
+      </div>
+      
+      <p class="card-text text-muted small mb-3 flex-grow-1">{{ assignment.description|truncate(120) }}</p>
+      
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="due-date-chip 
+                  {% if assignment.due_date.date() < current_date %}due-past
+                  {% elif (assignment.due_date.date() - current_date).days <= 3 %}due-soon
+                  {% else %}due-later{% endif %}">
+          <i class="bi bi-calendar-event"></i>
+          {{ assignment.due_date.strftime('%b %d') }}
+        </span>
+        <span class="submission-stats">
+          {{ assignment.submissions_count }} submitted
+        </span>
+      </div>
+      
+      <div class="d-flex justify-content-between">
+        <a href="
+        {% if assignment.assignment_type == 'Descriptive' %}
+            {{ url_for('student.view_descriptive_assignment', assignment_id=assignment.id) }}
+        {% elif assignment.assignment_type == 'Coding' %}
+            {{ url_for('student.view_coding_assignment', assignment_id=assignment.id) }}
+        {% elif assignment.assignment_type == 'Quiz' %}
+            {{ url_for('student.view_quiz_assignment', assignment_id=assignment.id) }}
+        {% elif assignment.assignment_type == 'Debugging' %}
+            {{ url_for('debugging.view_debugging_assignment', assignment_id=assignment.id) }}
+        {% else %}
+            {{ url_for('student.view_assignment', assignment_id=assignment.id) }}
+        {% endif %}"
+        class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-eye me-1"></i> Details
+        </a>
+        
+        {% if assignment.due_date.date() >= current_date or assignment.allow_late_submissions %}
+          {% if assignment.assignment_type == 'Descriptive' %}
+            <a href="{{ url_for('descriptive.submit_descriptive', assignment_id=assignment.id) }}"
+               class="btn btn-sm btn-primary">
+              <i class="bi bi-upload me-1"></i> Submit
+            </a>
+          {% elif assignment.assignment_type == 'Coding' %}
+            <a href="{{ url_for('coding.coding_assessment', assignment_id=assignment.id) }}"
+               class="btn btn-sm btn-primary">
+              <i class="bi bi-code me-1"></i> Start Coding
+            </a>
+          {% elif assignment.assignment_type == 'Quiz' %}
+            {% set quiz_attempt = assignment.quiz_attempts|selectattr("student_id", "equalto", current_student.id)|first %}
+            {% if quiz_attempt and quiz_attempt.status == 'ready' %}
+              <a href="{{ url_for('quiz_loading.view_quiz', attempt_id=quiz_attempt.id) }}"
+                 class="btn btn-sm btn-success">
+                <i class="bi bi-play-fill me-1"></i> Take Quiz
+              </a>
+            {% else %}
+              <a href="{{ url_for('student.view_quiz_assignment', assignment_id=assignment.id) }}"
+                 class="btn btn-sm btn-primary">
+                <i class="bi bi-magic me-1"></i> Generate Quiz
+              </a>
+            {% endif %}
+          {% elif assignment.assignment_type == 'Debugging' %}
+            <a href="{{ url_for('debugging.start_debugging', assignment_id=assignment.id) }}"
+               class="btn btn-sm btn-primary">
+              <i class="bi bi-bug me-1"></i> Start Debugging
+            </a>
+          {% else %}
+            <a href="{{ url_for('student.submit_assignment', assignment_id=assignment.id) }}"
+               class="btn btn-sm btn-primary">
+              <i class="bi bi-upload me-1"></i> Submit
+            </a>
+          {% endif %}
+        {% else %}
+          <span class="btn btn-sm btn-outline-secondary disabled">
+            <i class="bi bi-lock me-1"></i> Closed
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teacher Signup</title>
+  <!-- Bootstrap 5 CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    /* Body background with a subtle gradient */
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #FF8F8F, #ffffff);
+    }
+    /* Center the card using flex */
+    .full-height {
+      min-height: 100vh;
+    }
+    /* Card styling */
+    .login-card {
+      border: none;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    /* Left column: Teacher Illustration with pale light red */
+    .teacher-illustration {
+      background-color: #ffe6e6;
+    }
+    .teacher-illustration img {
+      max-width: 80%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    /* Right column: Form */
+    .login-form .card-body {
+      padding: 2rem;
+    }
+    /* Form styling */
+    .form-label {
+      font-weight: 500;
+      color: #495057;
+    }
+    .form-control {
+      border-radius: 10px;
+    }
+    .btn-success {
+      background-color: #dc3545; /* matching red theme */
+      border-color: #dc3545;
+      border-radius: 10px;
+      font-weight: 600;
+      padding: 0.6rem 1.2rem;
+    }
+    .btn-success:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+    }
+    /* Headings */
+    h3 {
+      color: #343a40;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid full-height d-flex justify-content-center align-items-center">
+    <div class="row w-100 justify-content-center">
+      <div class="col-md-10 col-lg-8">
+        <div class="card login-card">
+          <div class="row g-0">
+            <!-- Left side: Teacher Illustration -->
+            <div class="col-md-6 teacher-illustration d-flex align-items-center">
+              <!-- Replace the src with your own teacher illustration -->
+              <img
+                src="https://img.freepik.com/free-vector/teacher-character-illustration_24877-55832.jpg"
+                alt="Teacher Illustration"
+              />
+            </div>
+            <!-- Right side: Signup Form -->
+            <div class="col-md-6 d-flex align-items-center login-form">
+              <div class="card-body w-100">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+                <h3 class="mb-3">Teacher Signup</h3>
+                <p class="text-muted mb-4">
+                  Create your account by filling in the details below.
+                </p>
+                <form method="POST">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="name"
+                      name="name"
+                      placeholder="Your Name"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="email"
+                      name="email"
+                      placeholder="your-email@example.com"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="password"
+                      name="password"
+                      placeholder="Create a password"
+                      required
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-success w-100">Sign Up</button>
+                </form>
+                <div class="text-center mt-3">
+                  <span class="text-muted">Already have an account?</span>
+                  <a href="{{ url_for('auth.teacher_login') }}" class="text-decoration-none">Login here</a>
+                </div>
+              </div>
+            </div>
+            <!-- End Right side -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap 5 JS Bundle with Popper -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
+</body>
+</html>

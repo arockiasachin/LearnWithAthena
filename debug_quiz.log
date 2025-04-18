@@ -1,0 +1,186 @@
+2025-04-05 18:59:47,585 - INFO - === Starting Quiz Attempt Test ===
+2025-04-05 18:59:47,661 - INFO - No quiz assignments found, creating test quiz...
+2025-04-05 18:59:47,666 - ERROR - Quiz attempt failed!
+Traceback (most recent call last):
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.IntegrityError: NOT NULL constraint failed: assignments.teacher_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\SachinSlade\AppData\Local\Temp\ipykernel_23864\364358727.py", line 37, in test_quiz_attempt
+    db_session.commit()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 2028, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4352, in flush
+    self._flush(objects)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4487, in _flush
+    with util.safe_reraise():
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4448, in _flush
+    flush_context.execute()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: assignments.teacher_id
+[SQL: INSERT INTO assignments (teacher_id, subject_id, title, description, instructions, assignment_type, created_at, due_date, max_points, is_published, allow_late_submissions, late_submission_penalty, is_timed, time_limit_minutes, auto_grade, complexity_level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: (None, 1, 'Debug Quiz - Computer Networks', 'Sample quiz for debugging purposes', None, 'Quiz', '2025-04-05 13:29:47.665266', '2025-04-05 13:29:47.662265', 100, 1, 0, None, 0, 60, 0, None)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-04-05 18:59:47,681 - ERROR - === Quiz Test Failed ===
+2025-04-05 19:01:59,594 - INFO - === Starting Quiz Attempt Test ===
+2025-04-05 19:01:59,599 - INFO - No quiz assignments found, creating test quiz...
+2025-04-05 19:01:59,603 - ERROR - Quiz attempt failed!
+Traceback (most recent call last):
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.IntegrityError: CHECK constraint failed: check_due_after_creation
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\SachinSlade\AppData\Local\Temp\ipykernel_23864\1753956885.py", line 49, in test_quiz_attempt
+    db_session.flush()  # Get the ID before creating QuizAssignment
+    ^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4352, in flush
+    self._flush(objects)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4487, in _flush
+    with util.safe_reraise():
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4448, in _flush
+    flush_context.execute()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: check_due_after_creation
+[SQL: INSERT INTO assignments (teacher_id, subject_id, title, description, instructions, assignment_type, created_at, due_date, max_points, is_published, allow_late_submissions, late_submission_penalty, is_timed, time_limit_minutes, auto_grade, complexity_level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: (1, 1, 'Debug Quiz - Computer Networks', 'Sample quiz for debugging purposes', None, 'Quiz', '2025-04-05 13:31:59.600209', '2025-04-05 13:31:59.600209', 100, 1, 0, None, 0, 60, 0, None)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-04-05 19:01:59,606 - ERROR - === Quiz Test Failed ===
+2025-04-05 19:23:17,842 - INFO - === Starting Quiz Attempt Test ===
+2025-04-05 19:23:17,855 - ERROR - Quiz attempt failed!
+Traceback (most recent call last):
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.IntegrityError: CHECK constraint failed: check_due_after_creation
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\SachinSlade\AppData\Local\Temp\ipykernel_23864\3917774505.py", line 88, in test_quiz_attempt
+    db_session.flush()  # Get the ID before creating QuizAssignment
+    ^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4352, in flush
+    self._flush(objects)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4487, in _flush
+    with util.safe_reraise():
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4448, in _flush
+    flush_context.execute()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: check_due_after_creation
+[SQL: INSERT INTO assignments (teacher_id, subject_id, title, description, instructions, assignment_type, created_at, due_date, max_points, is_published, allow_late_submissions, late_submission_penalty, is_timed, time_limit_minutes, auto_grade, complexity_level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: (1, 1, 'Debug Quiz - Computer Networks', 'Sample quiz for debugging purposes', None, 'Quiz', '2025-04-05 13:53:17.855528', '2025-04-05 13:53:17.855528', 100, 1, 0, None, 0, 60, 0, None)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-04-05 19:23:17,861 - ERROR - === Quiz Test Failed ===

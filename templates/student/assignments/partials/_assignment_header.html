@@ -1,0 +1,32 @@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-3">
+  <div>
+    <h2 class="mb-2">{{ assignment.title }}</h2>
+    <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+      <span class="badge bg-secondary assignment-badge">{{ assignment.subject.name }}</span>
+      <span class="badge 
+                {% if assignment.assignment_type == 'Quiz' %}bg-info
+                {% elif assignment.assignment_type == 'Descriptive' %}bg-primary
+                {% elif assignment.assignment_type == 'Coding' %}bg-purple
+                {% elif assignment.assignment_type == 'Debugging' %}bg-danger
+                {% else %}bg-secondary{% endif %}">
+        {{ assignment.assignment_type }}
+      </span>
+    </div>
+  </div>
+  
+  <span class="due-date-chip mt-2 mt-md-0
+            {% if assignment.due_date.date() < current_date %}due-past
+            {% elif (assignment.due_date.date() - current_date).days <= 3 %}due-soon
+            {% else %}due-later{% endif %}">
+    <i class="bi bi-calendar-event me-1"></i>
+    Due: {{ assignment.due_date.strftime('%b %d, %Y') }}
+  </span>
+</div>
+
+<!-- Description Section -->
+<div class="mb-4">
+  <h5 class="mb-3"><i class="bi bi-card-text me-2"></i>Description</h5>
+  <div class="description-box">
+    {{ assignment.description or "No description provided"|safe }}
+  </div>
+</div>

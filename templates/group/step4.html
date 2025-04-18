@@ -1,0 +1,40 @@
+{% extends "student_base.html" %}
+
+{% block title %}Group Formation - Step 4{% endblock %}
+
+{% block content %}
+<div class="card profile-card">
+  <div class="progress mb-4">
+    <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+      Step 4 of 4
+    </div>
+  </div>
+  <div class="card-body">
+    <h4 class="mb-4">Step 4: Repository Setup</h4>
+    <form method="post" action="{{ url_for('group.formation.formation_step4') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      
+
+      
+      <div class="mb-3">
+        <label for="access_token" class="form-label">GitHub Access Token <span class="text-danger">*</span></label>
+        <input type="password" class="form-control" id="access_token" name="access_token"
+               placeholder="ghp_yourTokenHere" required>
+        <small class="form-text text-muted">
+          Required to create the repository. Token needs <code>repo</code> permissions.
+        </small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="privacy" class="form-label">Repository Privacy</label>
+        <select class="form-select" id="privacy" name="privacy">
+          <option value="private" selected>Private (recommended)</option>
+          <option value="public">Public</option>
+        </select>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">Complete Setup</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

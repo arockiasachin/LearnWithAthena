@@ -1,0 +1,321 @@
+2025-04-03 01:52:12,668 - INFO - === Starting Submission Test ===
+2025-04-03 01:52:12,674 - DEBUG - Found assignment: Constraint Satisfaction
+2025-04-03 01:52:12,675 - DEBUG - Created submission object:
+2025-04-03 01:52:12,676 - DEBUG -  - Assignment ID: 55
+2025-04-03 01:52:12,677 - DEBUG -  - Student ID: 1
+2025-04-03 01:52:12,679 - DEBUG -  - Content length: 23 chars
+2025-04-03 01:52:12,680 - DEBUG - 
+Before commit:
+2025-04-03 01:52:12,683 - DEBUG - Session new objects: IdentitySet([])
+2025-04-03 01:52:12,684 - DEBUG - Session dirty objects: IdentitySet([])
+2025-04-03 01:52:12,690 - ERROR - Submission failed!
+Traceback (most recent call last):
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.IntegrityError: CHECK constraint failed: check_submission_time
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\SachinSlade\AppData\Local\Temp\ipykernel_19552\3816654159.py", line 55, in test_submission
+    db_session.commit()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 2028, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4352, in flush
+    self._flush(objects)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4487, in _flush
+    with util.safe_reraise():
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4448, in _flush
+    flush_context.execute()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) CHECK constraint failed: check_submission_time
+[SQL: INSERT INTO assignment_submissions (assignment_id, student_id, submitted_at, content, attachment_path, grade, feedback, status, graded_at, feedback_read_at, attempt_number, late_penalty) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: (55, 1, '2025-04-02 20:22:12.688958', 'Test submission content', None, None, None, 'submitted', None, None, 1, None)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-04-03 01:52:12,713 - ERROR - === Test Failed ===
+2025-04-03 02:01:40,020 - INFO - === Starting Submission Test ===
+2025-04-03 02:01:40,142 - ERROR - Assignment not found
+2025-04-03 02:01:40,144 - ERROR - === Test Failed ===
+2025-04-03 02:02:01,945 - INFO - === Starting Submission Test ===
+2025-04-03 02:02:01,948 - ERROR - Assignment not found
+2025-04-03 02:02:01,948 - ERROR - === Test Failed ===
+2025-04-03 02:02:02,737 - INFO - === Starting Submission Test ===
+2025-04-03 02:02:02,740 - ERROR - Assignment not found
+2025-04-03 02:02:02,742 - ERROR - === Test Failed ===
+2025-04-03 02:03:42,892 - INFO - Existing assignments in database:
+2025-04-03 02:03:42,893 - INFO - ID: 1, Title: Python Basics Assignment
+2025-04-03 02:03:42,893 - INFO - ID: 2, Title: Data Structures Quiz
+2025-04-03 02:03:42,895 - INFO - ID: 3, Title: Algorithm Development Stages
+2025-04-03 02:03:42,897 - INFO - ID: 4, Title: Complexity Analysis Implementation
+2025-04-03 02:03:42,898 - INFO - ID: 5, Title: Recursive Error Fix
+2025-04-03 02:03:42,900 - INFO - ID: 6, Title: Complexity Analysis Quiz
+2025-04-03 02:03:42,901 - INFO - ID: 7, Title: Recursion vs Iteration
+2025-04-03 02:03:42,902 - INFO - ID: 8, Title: Stack Operations
+2025-04-03 02:03:42,904 - INFO - ID: 9, Title: Stack Implementation Fix
+2025-04-03 02:03:42,906 - INFO - ID: 10, Title: Problem Formulation Quiz
+2025-04-03 02:03:42,907 - INFO - ID: 11, Title: Algorithm Specification
+2025-04-03 02:03:42,908 - INFO - ID: 12, Title: Counting Sort Implementation
+2025-04-03 02:03:42,909 - INFO - ID: 13, Title: Radix Sort Fix
+2025-04-03 02:03:42,910 - INFO - ID: 14, Title: Algorithm Selection Quiz
+2025-04-03 02:03:42,912 - INFO - ID: 15, Title: Technique Justification
+2025-04-03 02:03:42,913 - INFO - ID: 16, Title: Hybrid Search Algorithm
+2025-04-03 02:03:42,914 - INFO - ID: 17, Title: Search Algorithm Fix
+2025-04-03 02:03:42,916 - INFO - ID: 18, Title: Algorithm Design Quiz
+2025-04-03 02:03:42,917 - INFO - ID: 19, Title: Design Trade-offs
+2025-04-03 02:03:42,918 - INFO - ID: 20, Title: BST Validation Fix
+2025-04-03 02:03:42,920 - INFO - ID: 21, Title: Design Process Quiz
+2025-04-03 02:03:42,921 - INFO - ID: 22, Title: Case Study Analysis
+2025-04-03 02:03:42,921 - INFO - ID: 23, Title: B-tree Insertion
+2025-04-03 02:03:42,922 - INFO - ID: 24, Title: B+ Tree Fix
+2025-04-03 02:03:42,922 - INFO - ID: 25, Title: Balanced Trees Quiz
+2025-04-03 02:03:42,923 - INFO - ID: 26, Title: Tree Comparison
+2025-04-03 02:03:42,925 - INFO - ID: 27, Title: Threaded Tree Traversal
+2025-04-03 02:03:42,926 - INFO - ID: 28, Title: Threading Fix
+2025-04-03 02:03:42,927 - INFO - ID: 29, Title: Greedy Algorithms Quiz
+2025-04-03 02:03:42,928 - INFO - ID: 30, Title: Greedy Application
+2025-04-03 02:03:42,929 - INFO - ID: 31, Title: BFS Implementation
+2025-04-03 02:03:42,930 - INFO - ID: 32, Title: DFS Fix
+2025-04-03 02:03:42,931 - INFO - ID: 33, Title: Scheduling Quiz
+2025-04-03 02:03:42,932 - INFO - ID: 34, Title: Real-world Scheduling
+2025-04-03 02:03:42,933 - INFO - ID: 35, Title: Dijkstra's Algorithm
+2025-04-03 02:03:42,934 - INFO - ID: 36, Title: Path Finding Fix
+2025-04-03 02:03:42,935 - INFO - ID: 37, Title: Divide & Conquer Quiz
+2025-04-03 02:03:42,936 - INFO - ID: 38, Title: Multiplication Analysis
+2025-04-03 02:03:42,937 - INFO - ID: 39, Title: Boruvka's Algorithm
+2025-04-03 02:03:42,938 - INFO - ID: 40, Title: Kruskal's Fix
+2025-04-03 02:03:42,939 - INFO - ID: 41, Title: Matrix Algorithms Quiz
+2025-04-03 02:03:42,940 - INFO - ID: 42, Title: Algorithm Optimization
+2025-04-03 02:03:42,942 - INFO - ID: 43, Title: Heap Operations
+2025-04-03 02:03:42,943 - INFO - ID: 44, Title: Hash Table Fix
+2025-04-03 02:03:42,944 - INFO - ID: 45, Title: DP Fundamentals Quiz
+2025-04-03 02:03:42,945 - INFO - ID: 46, Title: DP Application
+2025-04-03 02:03:42,945 - INFO - ID: 47, Title: LCS Implementation
+2025-04-03 02:03:42,946 - INFO - ID: 48, Title: Edit Distance Fix
+2025-04-03 02:03:42,948 - INFO - ID: 49, Title: Backtracking Quiz
+2025-04-03 02:03:42,948 - INFO - ID: 50, Title: Constraint Satisfaction
+2025-04-03 02:03:42,949 - INFO - ID: 51, Title: Subset Sum Solver
+2025-04-03 02:03:42,951 - INFO - ID: 52, Title: Knapsack Fix
+2025-04-03 02:03:42,952 - INFO - ID: 53, Title: Constraint Satisfaction
+2025-04-03 02:05:00,503 - INFO - === Starting Submission Test ===
+2025-04-03 02:05:00,505 - INFO - Using assignment: Python Basics Assignment (ID: 1)
+2025-04-03 02:05:00,510 - INFO - Using student: Arockia Sachin A (ID: 1)
+2025-04-03 02:05:00,512 - DEBUG - Created submission object:
+2025-04-03 02:05:00,512 - DEBUG -  - Assignment ID: 1
+2025-04-03 02:05:00,513 - DEBUG -  - Student ID: 1
+2025-04-03 02:05:00,514 - DEBUG -  - Content length: 23 chars
+2025-04-03 02:05:00,520 - ERROR - Submission failed!
+Traceback (most recent call last):
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1815, in _execute_context
+    context = constructor(
+              ^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 1421, in _init_compiled
+    self._process_execute_defaults()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 2356, in _process_execute_defaults
+    param[param_key] = arg(self)
+                       ^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\sql\schema.py", line 3602, in <lambda>
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+                                          ^^^^
+  File "d:\LearnwithAthena\Base\models.py", line 407, in <lambda>
+    default=lambda: datetime.now(timezone.utc),  # Correct timezone-aware default
+                                 ^^^^^^^^
+NameError: name 'timezone' is not defined
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\SachinSlade\AppData\Local\Temp\ipykernel_22172\1177309401.py", line 57, in test_submission
+    db_session.commit()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 2028, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4352, in flush
+    self._flush(objects)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4487, in _flush
+    with util.safe_reraise():
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\session.py", line 4448, in _flush
+    flush_context.execute()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1821, in _execute_context
+    self._handle_dbapi_exception(
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\base.py", line 1815, in _execute_context
+    context = constructor(
+              ^^^^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 1421, in _init_compiled
+    self._process_execute_defaults()
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\engine\default.py", line 2356, in _process_execute_defaults
+    param[param_key] = arg(self)
+                       ^^^^^^^^^
+  File "c:\Users\SachinSlade\anaconda3\envs\PytorchGPU\Lib\site-packages\sqlalchemy\sql\schema.py", line 3602, in <lambda>
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+                                          ^^^^
+  File "d:\LearnwithAthena\Base\models.py", line 407, in <lambda>
+    default=lambda: datetime.now(timezone.utc),  # Correct timezone-aware default
+                                 ^^^^^^^^
+sqlalchemy.exc.StatementError: (builtins.NameError) name 'timezone' is not defined
+[SQL: INSERT INTO assignment_submissions (assignment_id, student_id, submitted_at, content, attachment_path, grade, feedback, status, graded_at, feedback_read_at, attempt_number, late_penalty) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id]
+[parameters: [{'attempt_number': 1, 'assignment_id': 1, 'content': 'Test submission content', 'student_id': 1, 'status': 'submitted', 'grade': None, 'attachment_path': None, 'late_penalty': None, 'feedback': None, 'feedback_read_at': None, 'graded_at': None}]]
+2025-04-03 02:05:00,572 - ERROR - === Test Failed ===
+2025-04-03 02:10:45,122 - INFO - === Starting Submission Test ===
+2025-04-03 02:10:45,208 - INFO - Using assignment: Python Basics Assignment (ID: 1)
+2025-04-03 02:10:45,213 - INFO - Using student: Arockia Sachin A (ID: 1)
+2025-04-03 02:10:45,213 - DEBUG - Created submission object:
+2025-04-03 02:10:45,214 - DEBUG -  - Assignment ID: 1
+2025-04-03 02:10:45,216 - DEBUG -  - Student ID: 1
+2025-04-03 02:10:45,219 - DEBUG -  - Content length: 23 chars
+2025-04-03 02:10:45,238 - INFO - Commit executed
+2025-04-03 02:10:45,248 - INFO - Submission created with ID: 2
+2025-04-03 02:10:45,250 - INFO - Submission timestamp: 2025-04-02 20:40:45.223372
+2025-04-03 02:10:45,252 - INFO - === Test Successful ===
+2025-04-03 02:21:14,714 - INFO - === Starting Submission Test ===
+2025-04-03 02:21:14,718 - INFO - Using assignment: Python Basics Assignment (ID: 1)
+2025-04-03 02:21:14,719 - INFO - Using student: Arockia Sachin A (ID: 1)
+2025-04-03 02:21:14,720 - DEBUG - Created submission object:
+2025-04-03 02:21:14,722 - DEBUG -  - Assignment ID: 1
+2025-04-03 02:21:14,724 - DEBUG -  - Student ID: 1
+2025-04-03 02:21:14,725 - DEBUG -  - Content length: 23 chars
+2025-04-03 02:21:14,741 - INFO - Commit executed
+2025-04-03 02:21:14,744 - INFO - Submission created with ID: 3
+2025-04-03 02:21:14,745 - INFO - Submission timestamp: 2025-04-02 20:51:14.727588
+2025-04-03 02:21:14,747 - INFO - === Test Successful ===
+2025-04-03 02:21:16,144 - INFO - === Starting Submission Test ===
+2025-04-03 02:21:16,147 - INFO - Using assignment: Python Basics Assignment (ID: 1)
+2025-04-03 02:21:16,149 - INFO - Using student: Arockia Sachin A (ID: 1)
+2025-04-03 02:21:16,151 - DEBUG - Created submission object:
+2025-04-03 02:21:16,153 - DEBUG -  - Assignment ID: 1
+2025-04-03 02:21:16,154 - DEBUG -  - Student ID: 1
+2025-04-03 02:21:16,155 - DEBUG -  - Content length: 23 chars
+2025-04-03 02:21:16,171 - INFO - Commit executed
+2025-04-03 02:21:16,175 - INFO - Submission created with ID: 4
+2025-04-03 02:21:16,176 - INFO - Submission timestamp: 2025-04-02 20:51:16.157546
+2025-04-03 02:21:16,178 - INFO - === Test Successful ===
+2025-04-03 02:21:20,341 - INFO - Existing assignments in database:
+2025-04-03 02:21:20,346 - INFO - ID: 1, Title: Python Basics Assignment
+2025-04-03 02:21:20,347 - INFO - ID: 2, Title: Data Structures Quiz
+2025-04-03 02:21:20,349 - INFO - ID: 3, Title: Algorithm Development Stages
+2025-04-03 02:21:20,351 - INFO - ID: 4, Title: Complexity Analysis Implementation
+2025-04-03 02:21:20,352 - INFO - ID: 5, Title: Recursive Error Fix
+2025-04-03 02:21:20,355 - INFO - ID: 6, Title: Complexity Analysis Quiz
+2025-04-03 02:21:20,356 - INFO - ID: 7, Title: Recursion vs Iteration
+2025-04-03 02:21:20,357 - INFO - ID: 8, Title: Stack Operations
+2025-04-03 02:21:20,358 - INFO - ID: 9, Title: Stack Implementation Fix
+2025-04-03 02:21:20,359 - INFO - ID: 10, Title: Problem Formulation Quiz
+2025-04-03 02:21:20,361 - INFO - ID: 11, Title: Algorithm Specification
+2025-04-03 02:21:20,362 - INFO - ID: 12, Title: Counting Sort Implementation
+2025-04-03 02:21:20,363 - INFO - ID: 13, Title: Radix Sort Fix
+2025-04-03 02:21:20,364 - INFO - ID: 14, Title: Algorithm Selection Quiz
+2025-04-03 02:21:20,366 - INFO - ID: 15, Title: Technique Justification
+2025-04-03 02:21:20,367 - INFO - ID: 16, Title: Hybrid Search Algorithm
+2025-04-03 02:21:20,369 - INFO - ID: 17, Title: Search Algorithm Fix
+2025-04-03 02:21:20,370 - INFO - ID: 18, Title: Algorithm Design Quiz
+2025-04-03 02:21:20,371 - INFO - ID: 19, Title: Design Trade-offs
+2025-04-03 02:21:20,372 - INFO - ID: 20, Title: BST Validation Fix
+2025-04-03 02:21:20,373 - INFO - ID: 21, Title: Design Process Quiz
+2025-04-03 02:21:20,374 - INFO - ID: 22, Title: Case Study Analysis
+2025-04-03 02:21:20,376 - INFO - ID: 23, Title: B-tree Insertion
+2025-04-03 02:21:20,377 - INFO - ID: 24, Title: B+ Tree Fix
+2025-04-03 02:21:20,379 - INFO - ID: 25, Title: Balanced Trees Quiz
+2025-04-03 02:21:20,380 - INFO - ID: 26, Title: Tree Comparison
+2025-04-03 02:21:20,382 - INFO - ID: 27, Title: Threaded Tree Traversal
+2025-04-03 02:21:20,384 - INFO - ID: 28, Title: Threading Fix
+2025-04-03 02:21:20,385 - INFO - ID: 29, Title: Greedy Algorithms Quiz
+2025-04-03 02:21:20,386 - INFO - ID: 30, Title: Greedy Application
+2025-04-03 02:21:20,388 - INFO - ID: 31, Title: BFS Implementation
+2025-04-03 02:21:20,389 - INFO - ID: 32, Title: DFS Fix
+2025-04-03 02:21:20,390 - INFO - ID: 33, Title: Scheduling Quiz
+2025-04-03 02:21:20,391 - INFO - ID: 34, Title: Real-world Scheduling
+2025-04-03 02:21:20,393 - INFO - ID: 35, Title: Dijkstra's Algorithm
+2025-04-03 02:21:20,395 - INFO - ID: 36, Title: Path Finding Fix
+2025-04-03 02:21:20,396 - INFO - ID: 37, Title: Divide & Conquer Quiz
+2025-04-03 02:21:20,397 - INFO - ID: 38, Title: Multiplication Analysis
+2025-04-03 02:21:20,399 - INFO - ID: 39, Title: Boruvka's Algorithm
+2025-04-03 02:21:20,400 - INFO - ID: 40, Title: Kruskal's Fix
+2025-04-03 02:21:20,402 - INFO - ID: 41, Title: Matrix Algorithms Quiz
+2025-04-03 02:21:20,403 - INFO - ID: 42, Title: Algorithm Optimization
+2025-04-03 02:21:20,405 - INFO - ID: 43, Title: Heap Operations
+2025-04-03 02:21:20,406 - INFO - ID: 44, Title: Hash Table Fix
+2025-04-03 02:21:20,408 - INFO - ID: 45, Title: DP Fundamentals Quiz
+2025-04-03 02:21:20,409 - INFO - ID: 46, Title: DP Application
+2025-04-03 02:21:20,411 - INFO - ID: 47, Title: LCS Implementation
+2025-04-03 02:21:20,412 - INFO - ID: 48, Title: Edit Distance Fix
+2025-04-03 02:21:20,413 - INFO - ID: 49, Title: Backtracking Quiz
+2025-04-03 02:21:20,414 - INFO - ID: 50, Title: Constraint Satisfaction
+2025-04-03 02:21:20,416 - INFO - ID: 51, Title: Subset Sum Solver
+2025-04-03 02:21:20,417 - INFO - ID: 52, Title: Knapsack Fix
+2025-04-03 02:21:20,418 - INFO - ID: 53, Title: Constraint Satisfaction

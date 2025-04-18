@@ -1,0 +1,118 @@
+{% extends "teacher_base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Commit Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-6">Total Commits</dt>
+                        <dd class="col-6">{{ analysis.total_commits }}</dd>
+                        
+                        <dt class="col-6">Lines Changed</dt>
+                        <dd class="col-6">+{{ analysis.additions }}/-{{ analysis.deletions }}</dd>
+                        
+                        <dt class="col-6">Avg. Changes</dt>
+                        <dd class="col-6">{{ analysis.avg_changes }} lines/commit</dd>
+                        
+                        <dt class="col-6">Commit Frequency</dt>
+                        <dd class="col-6">{{ analysis.frequency }}</dd>
+                        
+                        <dt class="col-6">Top File Types</dt>
+                        <dd class="col-6">
+                            {% for ext, count in analysis.file_types.items() %}
+                            <span class="badge bg-secondary me-1">{{ ext }} ({{ count }})</span>
+                            {% else %}
+                            <span class="text-muted">N/A</span>
+                            {% endfor %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between">
+                    <h5>Code Contribution Report</h5>
+                    <a href="#" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-download"></i> Export
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="report-content">
+                        <h1 class="h4 mb-4">Student Code Contribution Report</h1>
+                        
+                        <div class="report-section">
+                            {{ report|safe }}
+                        </div>
+
+                        <hr class="mt-4">
+                        
+                        <div class="card-body">
+                            <div class="report-content">
+                                <div class="report-section">
+                                    {% for line in report.split('\n') %}
+                                        {% if line.startswith('## ') %}
+                                            <h2 class="report-section-header">{{ line[3:] }}</h2>
+                                        {% elif line.startswith('- ') %}
+                                            <li>{{ line[2:] }}</li>
+                                        {% else %}
+                                            <p>{{ line }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <hr class="mt-4">
+                                <div class="text-muted small mt-3">
+                                    <p class="mb-0">Report Generated: {{ report_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    <p>Reviewer: {{ session.get('teacher_name', 'System') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.report-content h2 {
+    font-size: 1.25rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3rem;
+}
+
+.report-content h3 {
+    font-size: 1.1rem;
+    margin-top: 1rem;
+    color: #34495e;
+}
+
+.report-content p {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.report-content ul {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.report-content hr {
+    margin: 1.5rem 0;
+    border-color: #eee;
+}
+
+.badge {
+    font-weight: normal;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,345 @@
+{% extends "teacher_base.html" %}
+
+{% block title %}Student Monitoring{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Student Monitoring</h2>
+  <div>
+    <button class="btn btn-danger">
+      <i class="bi bi-download me-2"></i> Export Data
+    </button>
+  </div>
+</div>
+
+<div class="mb-3">
+  <div class="btn-group" role="group">
+    <button class="btn btn-outline-danger active" data-view="table">
+      <i class="bi bi-table"></i> Table View
+    </button>
+    <button class="btn btn-outline-danger" data-view="cards">
+      <i class="bi bi-card-list"></i> Card View
+    </button>
+  </div>
+</div>
+
+<!-- Card View -->
+<div id="cards-view" class="d-none row row-cols-1 row-cols-md-3 g-4">
+  {% for student in students %}
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          {% if student.github_avatar %}
+          <img src="{{ student.github_avatar }}" class="rounded-circle me-3" width="50" height="50" alt="{{ student.name }}">
+          {% else %}
+          <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+            <i class="bi bi-person text-muted" style="font-size: 1.5rem;"></i>
+          </div>
+          {% endif %}
+          <div>
+            <h5 class="card-title mb-0">{{ student.name }}</h5>
+            <small class="text-muted">{{ student.email }}</small>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <span class="badge bg-secondary">
+            <i class="bi bi-people me-1"></i> {{ student.groups[0].group.name if student.groups else 'No Group' }}
+          </span>
+          <span class="badge bg-primary ms-1">
+            <i class="bi bi-journal-text me-1"></i> {{ student.assignment_submissions|length }} Submissions
+          </span>
+        </div>
+        
+        <button class="btn btn-sm btn-danger w-100" 
+                type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#submissions-{{ student.id }}">
+          <i class="bi bi-chevron-down me-1"></i> View Submissions
+        </button>
+        
+        <div class="collapse mt-3" id="submissions-{{ student.id }}">
+          <div class="card card-body bg-light">
+            {% if student.assignment_submissions %}
+            <div class="list-group list-group-flush">
+              {% for sub in student.assignment_submissions %}
+              <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h6 class="mb-1">{{ sub.assignment.title }}</h6>
+                    <small class="text-muted">
+                      {{ sub.assignment.subject.name }} | 
+                      Submitted: {{ sub.submitted_at.strftime('%b %d, %Y') }}
+                    </small>
+                    <div class="mt-2">
+                      <span class="badge bg-{{ 'success' if sub.grade else 'warning' }}">
+                        {{ sub.grade or 'Ungraded' }}/{{ sub.assignment.max_points }}
+                      </span>
+                      {% if sub.is_late %}
+                      <span class="badge bg-danger ms-1">Late</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-danger" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#gradeModal"
+                            data-submission-id="{{ sub.id }}"
+                            data-current-grade="{{ sub.grade }}"
+                            data-max-points="{{ sub.assignment.max_points }}"
+                            data-student-name="{{ student.name }}"
+                            data-assignment-title="{{ sub.assignment.title }}">
+                      <i class="bi bi-pencil"></i> Grade
+                    </button>
+                    <a href="{{ url_for('marks.view_submission', submission_id=sub.id) }}" 
+                       class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-eye"></i> View
+                    </a>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-3">
+              <i class="bi bi-journal-x text-muted" style="font-size: 2rem;"></i>
+              <p class="text-muted mt-2 mb-0">No submissions found</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Table View -->
+<div id="table-view" class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Registration No.</th>
+            <th>Group</th>
+            <th>Submissions</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                {% if student.github_avatar %}
+                <img src="{{ student.github_avatar }}" class="rounded-circle me-2" width="40" height="40" alt="{{ student.name }}">
+                {% else %}
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                  <i class="bi bi-person text-muted"></i>
+                </div>
+                {% endif %}
+                {{ student.name }}
+              </div>
+            </td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.register_number or 'N/A' }}</td>
+            <td>
+              {% if student.groups %}
+                {{ student.groups[0].group.name }}
+              {% else %}
+                Not in group
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge bg-primary">
+                {{ student.assignment_submissions|length }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-danger" 
+                      data-bs-toggle="collapse" 
+                      data-bs-target="#row-submissions-{{ student.id }}">
+                <i class="bi bi-list-ul"></i> View Submissions
+              </button>
+            </td>
+          </tr>
+          <tr class="collapse" id="row-submissions-{{ student.id }}">
+            <td colspan="6" class="p-0">
+              <div class="p-3 bg-light">
+                {% if student.assignment_submissions %}
+                <div class="list-group">
+                  {% for sub in student.assignment_submissions %}
+                  <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 class="mb-1">{{ sub.assignment.title }}</h6>
+                        <small class="text-muted">
+                          {{ sub.assignment.subject.name }} | 
+                          {{ sub.submitted_at.strftime('%b %d, %Y') }} | 
+                          <span class="badge bg-{{ 'success' if sub.grade else 'warning' }}">
+                            {{ sub.grade or 'Ungraded' }}/{{ sub.assignment.max_points }}
+                          </span>
+                          {% if sub.is_late %}
+                          <span class="badge bg-danger ms-1">Late</span>
+                          {% endif %}
+                        </small>
+                      </div>
+                      <div class="btn-group">
+                        <!-- Temporary debug -->
+<p style="color:red">Assignment Type: {{ sub.assignment.assignment_type }}</p>
+<p style="color:blue">Submission Type: {{ sub.submission_type }}</p>
+
+                        {% if sub.assignment.assignment_type in ['Coding', 'Descriptive'] or sub.submission_type in ['coding_submission', 'descriptive_submission'] %}
+                          <form method="POST" action="{{ url_for('teacher.auto_grade') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="submission_id" value="{{ sub.id }}">
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                              <i class="bi bi-magic"></i> Auto
+                            </button>
+                          </form>
+                        {% endif %}
+                        <button class="btn btn-sm btn-outline-danger" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#gradeModal"
+                                data-submission-id="{{ sub.id }}"
+                                data-current-grade="{{ sub.grade }}"
+                                data-max-points="{{ sub.assignment.max_points }}"
+                                data-student-name="{{ student.name }}"
+                                data-assignment-title="{{ sub.assignment.title }}">
+                          <i class="bi bi-pencil"></i> Manual
+                        </button>
+                        <a href="{{ url_for('marks.view_submission', submission_id=sub.id) }}" 
+                           class="btn btn-sm btn-outline-primary">
+                          <i class="bi bi-eye"></i> View
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                  <i class="bi bi-journal-x text-muted" style="font-size: 2rem;"></i>
+                  <p class="text-muted mt-2 mb-0">No submissions found</p>
+                </div>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Grade Modal -->
+<div class="modal fade" id="gradeModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('teacher.force_grade') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="submission_id" id="submissionId">
+        
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">Grade Submission</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Student</label>
+            <input type="text" class="form-control" id="studentName" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Assignment</label>
+            <input type="text" class="form-control" id="assignmentTitle" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Grade (out of <span id="maxPoints"></span>)</label>
+            <input type="number" name="grade" class="form-control" 
+                   min="0" id="maxPointsInput" step="0.1" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Feedback</label>
+            <textarea name="feedback" class="form-control" rows="4"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-danger">Save Grade</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // View toggle functionality
+  document.querySelectorAll('[data-view]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      document.getElementById('table-view').classList.toggle('d-none', this.dataset.view !== 'table');
+      document.getElementById('cards-view').classList.toggle('d-none', this.dataset.view !== 'cards');
+    });
+  });
+
+  // Grade modal setup
+  const gradeModal = document.getElementById('gradeModal');
+  if (gradeModal) {
+    gradeModal.addEventListener('show.bs.modal', function(event) {
+      const button = event.relatedTarget;
+      const modal = this;
+      
+      // Set form values
+      modal.querySelector('#submissionId').value = button.dataset.submissionId;
+      modal.querySelector('#studentName').value = button.dataset.studentName;
+      modal.querySelector('#assignmentTitle').value = button.dataset.assignmentTitle;
+      modal.querySelector('#maxPoints').textContent = button.dataset.maxPoints;
+      modal.querySelector('#maxPointsInput').max = button.dataset.maxPoints;
+      modal.querySelector('#maxPointsInput').value = button.dataset.currentGrade || '';
+    });
+  }
+
+  // Auto-resize textareas in modal
+  document.querySelectorAll('#gradeModal textarea').forEach(textarea => {
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+  });
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .list-group-item {
+    transition: background-color 0.2s;
+  }
+  .list-group-item:hover {
+    background-color: rgba(220, 53, 69, 0.05);
+  }
+  .card {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  .badge {
+    font-weight: 500;
+  }
+  .btn-outline-danger:hover {
+    color: white;
+  }
+</style>
+{% endblock %}
+{% endblock %}

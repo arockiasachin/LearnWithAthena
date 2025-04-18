@@ -1,0 +1,530 @@
+{% extends "student_base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+<style>
+  .code-editor-container {
+    width: 100%;
+    position: relative;
+  }
+  
+  .code-editor {
+    width: 100% !important;
+    height: 500px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+  }
+
+  #input-section {
+    margin-top: 1rem;
+  }
+
+  #code-input {
+    font-family: 'Courier New', monospace;
+    background: #f8f9fa;
+  }
+
+  .CodeMirror {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  .test-case {
+    margin-bottom: 0.75rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+    border-left: 4px solid #6c757d;
+  }
+  
+  .test-case.passed {
+    background: #d1e7dd;
+    border-left-color: #198754;
+  }
+  
+  .test-case.failed {
+    background: #f8d7da;
+    border-left-color: #dc3545;
+  }
+  
+  #terminal {
+    height: 250px;
+    background: #1e1e1e;
+    color: #e0e0e0;
+    padding: 1rem;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    border-radius: 0.375rem;
+    white-space: pre-wrap;
+  }
+  
+  .timer-display {
+    font-family: 'Courier New', monospace;
+    font-size: 1.25rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    color: white;
+    font-weight: bold;
+    min-width: 120px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .timer-warning {
+    background: rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    animation: pulse-warning 1.5s infinite;
+  }
+  
+  .timer-critical {
+    background: rgba(220, 53, 69, 0.3);
+    color: #ff6b6b;
+    animation: pulse-critical 0.8s infinite;
+  }
+  
+  @keyframes pulse-warning {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+  
+  @keyframes pulse-critical {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+  .language-badge {
+    font-size: 0.85rem;
+  }
+  
+  .card-header {
+    padding: 1rem 1.5rem;
+  }
+  
+  .problem-content {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 0.375rem;
+  }
+  
+  .test-case .input code,
+  .test-case .output code,
+  .test-case .expected code,
+  .test-case .actual code {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+  }
+  
+  #run-btn, #submit-btn {
+    min-width: 120px;
+  }
+  
+  @media (max-width: 992px) {
+    .code-editor {
+      height: 350px;
+    }
+    
+    #terminal {
+      height: 200px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .card-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    
+    .timer-display {
+      align-self: flex-end;
+      margin-top: 0.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <div>
+        <h3 class="mb-1">{{ assignment.title }}</h3>
+        <div class="d-flex align-items-center gap-2 mt-1">
+          <span class="badge language-badge bg-light text-dark">
+            <i class="bi bi-code me-1"></i>{{ assignment.language_options[0]|upper }}
+          </span>
+          <span class="badge language-badge bg-info">
+            <i class="bi bi-clock me-1"></i>
+            {{ (assignment.time_limit_seconds//3600) }}h {{ ((assignment.time_limit_seconds%3600)//60) }}m
+          </span>
+        </div>
+      </div>
+      <div class="timer-display" id="timer">{{ "%02d:%02d:%02d"|format(assignment.time_limit_seconds//3600, (assignment.time_limit_seconds%3600)//60, assignment.time_limit_seconds%60) }}</div>
+    </div>
+    
+    <div class="card-body">
+      <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Execution Constraints:</strong>
+        <ul class="mb-0 mt-2">
+          <li>Timeout: {{ assignment.time_limit_seconds }} seconds</li>
+          <li>Memory: {{ assignment.memory_limit_mb }} MB</li>
+        </ul>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-6 mb-4">
+          <h4 class="mb-3">Problem Statement</h4>
+          <div class="problem-content mb-4 border-start ps-3 border-primary">
+            {{ assignment.description|markdown }}
+          </div>
+          <h4 class="mb-3">Your Solution</h4>
+          <div class="mb-3">
+            <label class="form-label">Programming Language</label>
+            <select id="language-selector" class="form-select">
+              {% for lang in assignment.language_options %}
+              <option value="{{ lang }}" {% if loop.first %}selected{% endif %}>{{ lang|capitalize }}</option>
+              {% endfor %}
+            </select>
+            <div id="language-alert" class="alert alert-danger mt-2 d-none">
+              <i class="bi bi-x-circle me-2"></i>
+              Selected language not allowed for this assignment
+            </div>
+          </div>
+          
+          <div class="code-editor-container">
+            <textarea id="editor" class="code-editor">{{ assignment.starter_code|default('', true) }}</textarea>
+          </div>
+          
+          <!-- Moved input section inside the left column -->
+          <div class="mb-3" id="input-section">
+            <label for="code-input" class="form-label">Input for Code Execution</label>
+            <textarea id="code-input" class="form-control" rows="3" placeholder="Enter input values (separate multiple inputs with newlines)"></textarea>
+          </div>
+          
+          <div class="d-flex gap-2 mt-2">
+            <button id="run-btn" class="btn btn-outline-primary">
+              <i class="bi bi-play-fill me-1"></i> Run Code
+            </button>
+            <button id="run-tests-btn" class="btn btn-outline-secondary">
+              <i class="bi bi-check-circle me-1"></i> Run Test Cases
+            </button>
+            <button id="submit-btn" class="btn btn-primary">
+              <i class="bi bi-send-check me-1"></i> Submit
+            </button>
+          </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+          <h4 class="mb-3">Output</h4>
+          <div id="terminal">No output yet. Run your code to see results.</div>
+          
+          <h4 class="mt-4 mb-3">Test Results</h4>
+          <div class="d-flex justify-content-between mb-2">
+            <div>
+              Visible: <span id="visible-passed">0</span>/{{ assignment.test_cases|length }}
+              <span class="ms-2">Hidden: <span id="hidden-passed">0</span>/{{ assignment.hidden_test_cases|length }}</span>
+            </div>
+            <div class="text-muted small">
+              Score: <span id="current-score">0</span>/100
+            </div>
+          </div>
+          
+          <div id="test-results">
+            {% for test in assignment.test_cases %}
+            <div class="test-case" data-test-id="{{ test.id }}">
+              <div class="d-flex justify-content-between">
+                <strong>Test Case #{{ loop.index }}</strong>
+                <span class="badge bg-secondary">Pending</span>
+              </div>
+              <div class="mt-2">
+                <div class="input"><strong>Input:</strong> <code>{{ test.input }}</code></div>
+                <div class="expected mt-1"><strong>Expected:</strong> <code>{{ test.expected_output }}</code></div>
+                <div class="actual d-none mt-1"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>
+// Editor initialization and configuration
+let editor = null;
+let timerInterval = null;
+
+const languageConfigs = {
+  'python': {
+    mode: 'python',
+    lint: true,
+    indentUnit: 4,
+    lineNumbers: true,
+    gutters: ["CodeMirror-lint-markers"],
+    matchBrackets: true,
+    autoCloseBrackets: true
+  },
+  'javascript': {
+    mode: 'javascript',
+    lint: true,
+    indentUnit: 2,
+    lineNumbers: true,
+    gutters: ["CodeMirror-lint-markers"],
+    matchBrackets: true
+  },
+  'java': {
+    mode: 'text/x-java',
+    lint: false,
+    indentUnit: 4,
+    lineNumbers: true
+  },
+  'c': {
+    mode: 'text/x-csrc',
+    lint: false,
+    indentUnit: 4,
+    lineNumbers: true
+  }
+};
+
+function initializeEditor(lang) {
+  const textarea = document.getElementById('editor');
+  if (editor) {
+    editor.toTextArea();
+  }
+  const config = languageConfigs[lang] || { mode: 'python', lint: false };
+  editor = CodeMirror.fromTextArea(textarea, {
+    lineNumbers: true,
+    mode: config.mode,
+    theme: 'default',
+    indentUnit: config.indentUnit,
+    viewportMargin: Infinity,
+    lineWrapping: true,
+    autoRefresh: true,
+    gutters: config.gutters,
+    lint: config.lint,
+    matchBrackets: config.matchBrackets,
+    autoCloseBrackets: config.autoCloseBrackets
+  });
+}
+
+// Timer functionality
+function startTimer() {
+  let timeLeft = {{ assignment.time_limit_seconds }};
+  const timer = document.getElementById('timer');
+  
+  function updateTimer() {
+    const hours = Math.floor(timeLeft / 3600);
+    const mins = Math.floor((timeLeft % 3600) / 60);
+    const secs = Math.floor(timeLeft % 60);
+    
+    timer.textContent = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    
+    if (timeLeft <= 300) {
+      timer.classList.add('timer-warning');
+    }
+    if (timeLeft <= 60) {
+      timer.classList.remove('timer-warning');
+      timer.classList.add('timer-critical');
+    }
+    
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timer.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>TIME EXPIRED';
+      submitCode();
+      return;
+    }
+    timeLeft--;
+  }
+
+  if (timerInterval) {
+    clearInterval(timerInterval);
+  }
+  
+  updateTimer();
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+// Initialize editor and timer on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const initialLang = document.getElementById('language-selector').value;
+  initializeEditor(initialLang);
+  startTimer();
+});
+
+// Language selector change
+document.getElementById('language-selector').addEventListener('change', (e) => {
+  const lang = e.target.value;
+  initializeEditor(lang);
+  
+  const allowedLanguages = {{ assignment.language_options|tojson }};
+  const alert = document.getElementById('language-alert');
+  
+  if (!allowedLanguages.includes(lang)) {
+    alert.classList.remove('d-none');
+    document.getElementById('submit-btn').disabled = true;
+  } else {
+    alert.classList.add('d-none');
+    document.getElementById('submit-btn').disabled = false;
+  }
+});
+
+// Run code with sample input
+document.getElementById('run-btn').addEventListener('click', async () => {
+  const code = editor.getValue();
+  const language = document.getElementById('language-selector').value;
+  const input = document.getElementById('code-input').value;
+  const terminal = document.getElementById('terminal');
+  
+  terminal.textContent = "Running code...";
+  
+  try {
+    const response = await fetch('{{ url_for("execution.execute_code_endpoint") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token() }}'
+      },
+      body: JSON.stringify({ 
+        code, 
+        language,
+        test_input: input || "\n"  // Send empty newline if no input
+      })
+    });
+    
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const result = await response.json();
+    
+    // Display results
+    let output = result.output || 'No output generated';
+    if (result.error) {
+      output += `\nError: ${result.error}`;
+    }
+    terminal.textContent = output;
+    hljs.highlightElement(terminal);
+  } catch (error) {
+    terminal.textContent = `Execution Error: ${error.message}`;
+  }
+});
+
+// Run Test Cases functionality
+document.getElementById('run-tests-btn').addEventListener('click', async () => {
+  const code = editor.getValue();
+  const language = document.getElementById('language-selector').value;
+  const terminal = document.getElementById('terminal');
+  
+  terminal.textContent = "Running visible test cases...";
+  
+  // Reset UI
+  document.querySelectorAll('.test-case').forEach(el => {
+    el.classList.remove('passed', 'failed');
+    el.querySelector('.badge').className = 'badge bg-secondary';
+    el.querySelector('.badge').textContent = 'Pending';
+    el.querySelector('.actual')?.classList.add('d-none');
+  });
+
+  try {
+    const response = await fetch('{{ url_for("execution.execute_code_endpoint") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', 
+        'X-CSRFToken': '{{ csrf_token() }}'
+      },
+      body: JSON.stringify({
+        code: code,
+        language: language,
+        assignment_id: {{ assignment.id }}
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+
+    // Process visible test results
+    let visiblePassed = 0;
+    data.visible.forEach(result => {
+      const testElement = document.querySelector(`[data-test-id="${result.test_id}"]`);
+      if (!testElement) return;
+      
+      const badge = testElement.querySelector('.badge');
+      const actualEl = testElement.querySelector('.actual');
+      
+      testElement.classList.add(result.passed ? 'passed' : 'failed');
+      badge.className = `badge bg-${result.passed ? 'success' : 'danger'}`;
+      badge.textContent = result.passed ? 'Passed' : 'Failed';
+      
+      if (actualEl) {
+        actualEl.innerHTML = `<strong>Actual:</strong> <code>${result.output || 'No output'}</code>`;
+        if (result.error) {
+          actualEl.innerHTML += `<div class="text-danger"><strong>Error:</strong> ${result.error}</div>`;
+        }
+        actualEl.classList.remove('d-none');
+      }
+      
+      if (result.passed) visiblePassed++;
+    });
+
+    // Update visible counter only
+    document.getElementById('visible-passed').textContent = visiblePassed;
+    
+    // Calculate visible score portion
+    const score = Math.round(
+      (visiblePassed / {{ assignment.test_cases|length }} * {{ assignment.visible_weight * 100 }})
+    );
+    document.getElementById('current-score').textContent = score;
+
+    terminal.textContent = `Visible test execution completed. ${visiblePassed}/${data.visible.length} passed.`;
+    hljs.highlightElement(terminal);
+
+  } catch (error) {
+    terminal.textContent = `Error: ${error.message}`;
+    console.error('Test execution failed:', error);
+  }
+});
+// Submit button handler
+function submitCode() {
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = "{{ url_for('coding.coding_assessment', assignment_id=assignment.id) }}";
+  
+  const codeInput = document.createElement('input');
+  codeInput.type = 'hidden';
+  codeInput.name = 'code';
+  codeInput.value = editor.getValue();
+  
+  const langInput = document.createElement('input');
+  langInput.type = 'hidden';
+  langInput.name = 'language';
+  langInput.value = document.getElementById('language-selector').value;
+  
+  const csrfInput = document.createElement('input');
+  csrfInput.type = 'hidden';
+  csrfInput.name = 'csrf_token';
+  csrfInput.value = '{{ csrf_token() }}';
+  
+  form.appendChild(codeInput);
+  form.appendChild(langInput);
+  form.appendChild(csrfInput);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+// Attach submit handler
+document.getElementById('submit-btn').addEventListener('click', submitCode);
+</script>
+{% endblock %}

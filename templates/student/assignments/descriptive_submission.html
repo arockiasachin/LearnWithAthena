@@ -1,0 +1,225 @@
+<!-- templates/student/descriptive_submission.html -->
+{% extends "student_base.html" %}
+
+{% block title %}Submit {{ assignment.title }} - Descriptive{% endblock %}
+
+{% block extra_css %}
+<style>
+  .assignment-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .description-box {
+    border-left: 3px solid #0d6efd;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .due-date-chip {
+    font-size: 0.9rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  
+  .due-past {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+  }
+  
+  .due-soon {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+  }
+  
+  .due-later {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+  }
+  
+  .file-upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    background-color: #f8f9fa;
+    transition: all 0.2s;
+  }
+  
+  .file-upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #e9ecef;
+  }
+  
+  .file-upload-icon {
+    font-size: 2.5rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+  }
+  
+  .form-text {
+    font-size: 0.85rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card">
+    <div class="card-body">
+      <div class="assignment-header">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="mb-0">Submit: {{ assignment.title }}</h2>
+          <span class="due-date-chip 
+                    {% if assignment.due_date.date() < current_date %}due-past
+                    {% elif (assignment.due_date.date() - current_date).days <= 3 %}due-soon
+                    {% else %}due-later{% endif %}">
+            <i class="bi bi-calendar-event me-1"></i>
+            Due: {{ assignment.due_date.strftime('%b %d, %Y') }}
+          </span>
+        </div>
+        
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          {% if assignment.due_date.date() < current_date %}
+            This assignment is past due. Late submissions are 
+            {% if assignment.allow_late_submissions %}
+              allowed with a {{ assignment.late_submission_penalty or 0 }}% penalty.
+            {% else %}
+              not accepted.
+            {% endif %}
+          {% else %}
+            Due in {{ (assignment.due_date.date() - current_date).days }} days
+          {% endif %}
+        </div>
+        
+        <div class="mb-4">
+          <h5 class="mb-2">Assignment Description</h5>
+          <div class="description-box">
+            {{ assignment.description or "No description provided" }}
+          </div>
+        </div>
+      </div>
+      
+      <form method="POST" action="{{ url_for('descriptive.submit_descriptive', assignment_id=assignment.id) }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <div class="mb-4">
+          <h5 class="mb-3">Your Submission</h5>
+          
+          <div class="mb-3">
+            <label for="content" class="form-label">Response (Optional if uploading file)</label>
+            <textarea class="form-control" id="content" name="content" rows="8" 
+                      placeholder="Enter your assignment response here..."></textarea>
+            <div class="form-text">
+              Provide your answer here or upload a file below (or both)
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">File Upload (Optional)</label>
+            <div class="file-upload-area" id="fileDropArea">
+              <div class="file-upload-icon">
+                <i class="bi bi-cloud-arrow-up"></i>
+              </div>
+              <p class="mb-2">Drag & drop your file here or click to browse</p>
+              <input type="file" class="form-control d-none" id="file" name="file">
+              <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('file').click()">
+                <i class="bi bi-folder2-open me-1"></i> Select File
+              </button>
+              <div class="form-text mt-2">
+                Maximum file size: 10MB. Allowed formats: PDF, DOC, DOCX, TXT, ZIP, RAR, PNG, JPG, JPEG
+              </div>
+              <div id="fileName" class="mt-2 small text-muted"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+          <a href="{{ url_for('student.view_assignment', assignment_id=assignment.id) }}" 
+             class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Cancel
+          </a>
+          
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-upload me-1"></i> Submit Assignment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+// File upload display
+document.getElementById('file').addEventListener('change', function(e) {
+  const fileName = document.getElementById('fileName');
+  if (this.files.length > 0) {
+    fileName.textContent = 'Selected file: ' + this.files[0].name;
+    fileName.className = 'mt-2 small text-success';
+  } else {
+    fileName.textContent = '';
+  }
+});
+
+// Drag and drop functionality
+const fileDropArea = document.getElementById('fileDropArea');
+const fileInput = document.getElementById('file');
+
+fileDropArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  fileDropArea.style.borderColor = '#0d6efd';
+  fileDropArea.style.backgroundColor = '#e9ecef';
+});
+
+fileDropArea.addEventListener('dragleave', () => {
+  fileDropArea.style.borderColor = '#dee2e6';
+  fileDropArea.style.backgroundColor = '#f8f9fa';
+});
+
+fileDropArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  fileDropArea.style.borderColor = '#dee2e6';
+  fileDropArea.style.backgroundColor = '#f8f9fa';
+  
+  if (e.dataTransfer.files.length) {
+    fileInput.files = e.dataTransfer.files;
+    const fileName = document.getElementById('fileName');
+    fileName.textContent = 'Selected file: ' + e.dataTransfer.files[0].name;
+    fileName.className = 'mt-2 small text-success';
+  }
+});
+
+// Form validation
+(function () {
+  'use strict'
+  
+  const forms = document.querySelectorAll('.needs-validation')
+  
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      const content = form.querySelector('#content').value;
+      const file = form.querySelector('#file').files.length;
+      
+      // Validate at least one submission method
+      if (!content && !file) {
+        event.preventDefault();
+        event.stopPropagation();
+        alert('Please provide either a text response or a file attachment');
+      }
+      
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+{% endblock %}
+{% endblock %}

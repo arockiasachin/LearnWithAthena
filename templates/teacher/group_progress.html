@@ -1,0 +1,204 @@
+{% extends "teacher_base.html" %}
+
+{% block title %}Group Progress Monitoring{% endblock %}
+
+{% block extra_css %}
+<style>
+    .progress-card {
+        transition: transform 0.2s;
+    }
+    .progress-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .progress-thin {
+        height: 8px;
+    }
+    .activity-badge {
+        font-size: 0.75rem;
+    }
+    .contribution-avatar {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Group Progress Monitoring</h1>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="timePeriodDropdown" 
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-calendar-range me-1"></i> Last 30 Days
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="timePeriodDropdown">
+                <li><a class="dropdown-item" href="#">Last 7 Days</a></li>
+                <li><a class="dropdown-item" href="#">Last 30 Days</a></li>
+                <li><a class="dropdown-item" href="#">All Time</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted mb-2">Active Groups</h6>
+                            <h3 class="mb-0">{{ group_progress|length }}</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-people-fill text-primary fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted mb-2">Avg. Progress</h6>
+                            <h3 class="mb-0">
+                                {{ (group_progress|sum(attribute='progress')/group_progress|length if group_progress else 0)|round(1) }}%
+                            </h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-graph-up-arrow text-success fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted mb-2">Total Commits</h6>
+                            <h3 class="mb-0">{{ group_progress|sum(attribute='commit_count') }}</h3>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-code-square text-info fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted mb-2">Open PRs</h6>
+                            <h3 class="mb-0">{{ group_progress|sum(attribute='open_prs') }}</h3>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-git text-warning fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Group Progress Cards -->
+    <div class="row">
+        {% for gp in group_progress %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card progress-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ gp.group.name }}</h5>
+                    <span class="badge bg-secondary">{{ gp.group.group_identifier }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Project Progress</span>
+                            <span>{{ gp.progress|round(1) }}%</span>
+                        </div>
+                        <div class="progress progress-thin">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ gp.progress }}%" 
+                                 aria-valuenow="{{ gp.progress }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="card-subtitle mb-2 text-muted">GitHub Activity</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-info text-dark activity-badge">
+                                <i class="bi bi-code me-1"></i> {{ gp.commit_count }} commits
+                            </span>
+                            <span class="badge bg-warning text-dark activity-badge">
+                                <i class="bi bi-git me-1"></i> {{ gp.open_prs }} PRs
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="card-subtitle mb-2 text-muted">Members</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for member in gp.group.members %}
+                            <div class="d-flex align-items-center">
+                                {% if member.student.github_avatar %}
+                                <img src="{{ member.student.github_avatar }}" 
+                                     class="rounded-circle contribution-avatar me-1" 
+                                     alt="{{ member.student.name }}"
+                                     data-bs-toggle="tooltip" 
+                                     data-bs-placement="top" 
+                                     title="{{ member.student.name }}">
+                                {% else %}
+                                <div class="contribution-avatar rounded-circle bg-light text-center me-1" 
+                                     data-bs-toggle="tooltip" 
+                                     data-bs-placement="top" 
+                                     title="{{ member.student.name }}">
+                                    {{ member.student.name|first|upper }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('teacher.group_detail', group_id=gp.group.group_id) }}" 
+                       class="btn btn-sm btn-outline-primary">
+                        View Details
+                    </a>
+                    <a href="{{ url_for('teacher.github_report', group_id=gp.group.group_id) }}" 
+                       class="btn btn-sm btn-outline-info float-end">
+                        GitHub Report
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i> No groups with active projects found
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

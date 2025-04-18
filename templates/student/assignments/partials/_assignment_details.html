@@ -1,0 +1,118 @@
+<h5 class="mb-3"><i class="bi bi-info-circle me-2"></i>Details</h5>
+<div class="card h-100">
+  <div class="card-body">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-calendar-plus me-2"></i>Created:</span>
+        <span>{{ assignment.created_at.strftime('%b %d, %Y') }}</span>
+      </li>
+      
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-star-fill me-2"></i>Points:</span>
+        <span class="badge bg-primary rounded-pill">{{ assignment.max_points }}</span>
+      </li>
+      
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-clock-history me-2"></i>Status:</span>
+        <span class="badge 
+                  {% if assignment.due_date.date() < current_date %}bg-danger
+                  {% elif (assignment.due_date.date() - current_date).days <= 3 %}bg-warning text-dark
+                  {% else %}bg-success{% endif %}">
+          {% if assignment.due_date.date() < current_date %}
+            Past Due
+          {% elif (assignment.due_date.date() - current_date).days <= 3 %}
+            Due Soon
+          {% else %}
+            Active
+          {% endif %}
+        </span>
+      </li>
+      
+      <!-- Coding-specific details -->
+      {% if assignment.assignment_type == 'Coding' and assignment.language_options %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-code-square me-2"></i>Languages:</span>
+        <div>
+          {% for lang in assignment.language_options %}
+          <span class="badge bg-info me-1">{{ lang|upper }}</span>
+          {% endfor %}
+        </div>
+      </li>
+    {% endif %}
+    {% if assignment.assignment_type == 'Coding' %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-stopwatch me-2"></i>Time Limit:</span>
+        <span>
+          {% set hours = assignment.time_limit_seconds // 3600 %}
+          {% set minutes = (assignment.time_limit_seconds % 3600) // 60 %}
+          {% if hours > 0 %}{{ hours }}h {% endif %}{{ minutes }}m
+        </span>
+      </li>
+      
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-memory me-2"></i>Memory Limit:</span>
+        <span>{{ assignment.memory_limit_mb }} MB</span>
+      </li>
+      {% endif %}
+
+
+      
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-alarm me-2"></i>Late Submissions:</span>
+          <span>
+            {% if assignment.allow_late_submissions %}
+              <span class="text-success">Allowed</span>
+              {% if assignment.late_submission_penalty %}
+                <span class="text-danger">({{ assignment.late_submission_penalty }}% penalty)</span>
+              {% endif %}
+            {% else %}
+              <span class="text-danger">Not Allowed</span>
+            {% endif %}
+          </span>
+        </div>
+      </li>
+      
+      {% if assignment.attachments %}
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-paperclip me-1"></i>Attachments:</span>
+          <div class="d-flex flex-wrap gap-2 justify-content-end">
+            {% for attachment in assignment.attachments %}
+            <a href="{{ url_for('student.download_attachment', attachment_id=attachment.id) }}" 
+               class="badge bg-light text-dark text-decoration-none">
+              <i class="bi bi-file-earmark me-1"></i>{{ attachment.filename|truncate(20) }}
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </li>
+      {% endif %}
+      
+      <!-- Auto-grading indicator -->
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-robot me-2"></i>Grading:</span>
+        <span class="badge {% if assignment.auto_grade %}bg-success{% else %}bg-secondary{% endif %}">
+          {% if assignment.auto_grade %}Auto-graded{% else %}Manual grading{% endif %}
+        </span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<style>
+  .attachment-badge {
+    transition: all 0.2s ease;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .attachment-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .list-group-item {
+    padding: 0.75rem 1.25rem;
+  }
+</style>

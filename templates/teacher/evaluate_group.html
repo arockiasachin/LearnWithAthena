@@ -1,0 +1,107 @@
+<!-- [file name]: evaluate_group.html -->
+<!-- [file content begin] -->
+{% extends "teacher_base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Evaluate {{ group.name }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('teacher.group_management') }}">Groups</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Evaluation</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Project Details</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ project.name }}</h6>
+                    <p class="text-muted">{{ project.description }}</p>
+                    
+                    <dl class="row">
+                        <dt class="col-6">Start Date</dt>
+                        <dd class="col-6">{{ project.start_date.strftime('%Y-%m-%d') if project.start_date else 'N/A' }}</dd>
+                        
+                        <dt class="col-6">End Date</dt>
+                        <dd class="col-6">{{ project.end_date.strftime('%Y-%m-%d') if project.end_date else 'Ongoing' }}</dd>
+                        
+                        <dt class="col-6">Total Tasks</dt>
+                        <dd class="col-6">{{ project.tasks|length }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            {% if github_data %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">GitHub Insights</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Commits</span>
+                            <span>{{ github_data.commits }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Pull Requests</span>
+                            <span>{{ github_data.pull_requests }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Open Issues</span>
+                            <span>{{ github_data.issues }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-8">
+            <form method="POST">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Evaluation Rubric</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for category in rubric.categories %}
+                        <div class="mb-4">
+                            <h6>{{ category.name }} (Max {{ category.max_score }} points)</h6>
+                            <small class="text-muted">{{ category.criteria|join(', ') }}</small>
+                            
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" 
+                                       name="score_{{ category.name }}"
+                                       min="0" max="{{ category.max_score }}" 
+                                       step="0.5" required
+                                       placeholder="Enter score (0-{{ category.max_score }})">
+                                <span class="input-group-text">/ {{ category.max_score }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Overall Comments</label>
+                            <textarea class="form-control" name="comments" rows="4"
+                                      placeholder="Add evaluation comments..."></textarea>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i> Submit Evaluation
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!-- [file content end] -->
